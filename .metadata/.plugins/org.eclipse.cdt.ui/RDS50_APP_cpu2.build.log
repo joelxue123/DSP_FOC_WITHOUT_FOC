@@ -1,0 +1,9 @@
+
+**** Build of configuration _TI_v22_6_1_LTS_FLASH for project RDS50_APP_cpu2 ****
+
+"C:\\ti\\ccs1250\\ccs\\utils\\bin\\gmake" -k -j 16 all -O 
+ 
+gmake[1]: 'RDS50_APP_cpu2.out' is up to date.
+gmake[1]: Nothing to be done for 'secondary-outputs'.
+
+**** Build Finished ****
