@@ -10,15 +10,64 @@
 #define PIEMASK0                       64
 #define IFRMASK                        1
 
+#define M_PI (3.14159265358979323846f)
+#define LIMIT(value, max, min) ((value) > (max) ? (max) : ((value) < (min) ? (min) : (value)))
+
+float32 GetParm[48];
+enum MOTOR_PARM_E
+{
+    MOTOR_PARM_TORQUE_TEST_FRE = 0,
+    MOTOR_PARM_TKP,
+    MOTOR_PARM_TKD,
+    MOTOR_PARM_QKP,
+    MOTOR_PARM_QKD,
+    MOTOR_PARM_traj_position_flag,
+    MOTOR_PARM_motor_control_mode,
+    MOTOR_PARM_SPEED_SETPOINT,
+    MOTOR_PARM_POS_FRE,
+    MOTOR_PARM_POS_MAX,
+    MOTOR_PARM_torque_SETPOINT,
+
+};
+
 /*
  * *
- Te = 1.5*0.06;
- dw= 2*pi*(1600+1600)/60
- dt = 0.125  4HZ,°ëÖÜÆÚ0.125ms
- J = Te / ( dw / dt) = 3.3572e-05
- ÏÖÔÚÓĞÁË×ª¶¯¹ßÁ¿£¬¿ÉÒÔÈ¥Çó½â ×Ô¿¹ÈÅ¹Û²âÆ÷ÁË¡£
+ Te = 1.5*0.03;
+ dw= 2*pi*(1000+1000)/60
+ dt = 0.125  4HZ,é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·0.125ms
+ J = Te / ( dw / dt) = 8e-05
+ é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·è½¬é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·å»é”Ÿæ–¤æ‹·é”Ÿï¿½ é”Ÿçš†åŒ¡æ‹·é”Ÿè„šè§‚è¯§æ‹·é”Ÿæ–¤æ‹·é”Ÿå‰¿â˜…æ‹·
  * *
  */
+float32 t_ =0;
+float32  omega_ = 2*M_PI*10.0f;
+acceleration_ = 0;
+float32 velocity_ =0;
+float32 position_ = 0;
+float32 A_ = 0.02f;
+float32 phi_=0;
+int last_traj_position_flag =0;
+int traj_start_ = 0;
+void traj(float32 omega )
+{
+    if(traj_start_  == 0)
+        return;
+    if(t_<=30.0f)
+    {
+        A_ = GetParm[MOTOR_PARM_POS_MAX]/100.f;
+        acceleration_ = -A_*omega*omega*sinf(omega*t_ + phi_);
+        velocity_ = A_*omega*cosf(omega*t_ + phi_);
+        position_ = A_*sinf(omega*t_ + phi_);
+         t_+=0.0001;
+    }
+    else
+    {
+        acceleration_ = 0;
+        traj_start_ = 0;
+        velocity_ = 0;
+        position_ = 0;
+    }
+}
 
 
 
@@ -38,7 +87,7 @@ typedef struct
     float32 MotorAxisEncoderSpeed_radps;
     float32 AllCloseLoopEncoder_radps;
     float32 MotorCurrent_A;
-    float32 TorqueSensor_Nm;    //ÔÚcpu2²ÉÑù¼ÆËã
+    float32 TorqueSensor_Nm;    //é”Ÿæ–¤æ‹·cpu2é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·
     float32 TargetPos_rad;
     float32 TargetSpeed_radps;
     float32 TargetTorque_Nm;
@@ -99,16 +148,16 @@ bool is_first_torqute_init_ = true;
 float32 calculate_friction_force(float32 velocity)
 {
     if (velocity == 0) {
-        return 0; // ¾²Ì¬Ä¦²ÁÁ¦£¬·½ÏòÎ´¶¨Òå£¬Í¨³£ÔÚÆô¶¯Ê±¿¼ÂÇ
+        return 0; // é”Ÿæ–¤æ‹·æ€æ‘©é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·æœªé”Ÿæ–¤æ‹·é”Ÿè—‰ï¼Œé€šé”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·æ—¶é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·
     } else {
-        // ¶¯Ì¬Ä¦²ÁÁ¦£¬·½ÏòÓëËÙ¶È·½ÏòÏà·´
-        if (velocity > 20) {
-            return 0.3f; // ¸ºÔØÏòÓÒÒÆ¶¯£¬Ä¦²ÁÁ¦Ïò×ó
-        } else if (velocity < -20) {
-            return -0.3; // ¸ºÔØÏò×óÒÆ¶¯£¬Ä¦²ÁÁ¦ÏòÓÒ
+        // é”Ÿæ–¤æ‹·æ€æ‘©é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”ŸåŠ«åº¦å‡¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ´å
+        if (velocity > 30) {
+            return 0.3f; // é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿç‹¡è®¹æ‹·é”Ÿæ–¤æ‹·æ‘©é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·
+        } else if (velocity < -30) {
+            return -0.3f; // é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿç‹¡è®¹æ‹·é”Ÿæ–¤æ‹·æ‘©é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·
         }
     }
-    return 0; // ËÙ¶ÈÎª0Ê±£¬Ä¦²ÁÁ¦²»Ã÷È·£¬Í¨³£²»¼ÆÈë¶¯Ì¬¿ØÖÆ
+    return 0; // é”ŸåŠ«è®¹æ‹·ä¸º0æ—¶é”Ÿæ–¤æ‹·æ‘©é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·ç¡®é”Ÿæ–¤æ‹·é€šé”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿè¯«åŠ¨æ€é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·
 }
 
 
@@ -143,21 +192,22 @@ void inline CycleLoadTimerCalcEnd(CYCLELOADTIME_STRUCT * clt)
 
 
 typedef struct {
-    float32 alpha;  // ÂË²¨Æ÷ÏµÊı
-    float32 prevOut; // ÉÏÒ»´ÎµÄÊä³öÖµ
+    float32 alpha;  // é”Ÿå‰¿è¯§æ‹·é”Ÿæ–¤æ‹·ç³»é”Ÿæ–¤æ‹·
+    float32 prevOut; // é”Ÿæ–¤æ‹·ä¸€é”Ÿè½¿ç¢‰æ‹·é”Ÿæ–¤æ‹·é”Ÿè¡—ï¿½
 } IIRLowPassFilter;
 
 IIRLowPassFilter filter;
 IIRLowPassFilter filter_force;
+IIRLowPassFilter filter_force_derived;
 void initFilter(IIRLowPassFilter *filter, float32 cutoffFreq, float32 sampleRate) {
-    filter->alpha = 1.0f - exp(-2.0f * 3.1415f * cutoffFreq / sampleRate); // ¼ÆËãalphaÖµ
-    filter->prevOut = 0.0f; // ³õÊ¼»¯ÉÏÒ»´ÎµÄÊä³öÖµ
+    filter->alpha = 1.0f - exp(-2.0f * 3.1415f * cutoffFreq / sampleRate); // é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·alphaå€¼
+    filter->prevOut = 0.0f; // é”Ÿæ–¤æ‹·å§‹é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·ä¸€é”Ÿè½¿ç¢‰æ‹·é”Ÿæ–¤æ‹·é”Ÿè¡—ï¿½
 }
 
-// Ó¦ÓÃIIRµÍÍ¨ÂË²¨Æ÷
+// åº”é”Ÿæ–¤æ‹·IIRé”Ÿæ–¤æ‹·é€šé”Ÿå‰¿è¯§æ‹·é”Ÿæ–¤æ‹·
 float32 applyFilter(IIRLowPassFilter *filter, float32 input) {
     float32 output = filter->alpha * input + (1.0f - filter->alpha) * filter->prevOut;
-    filter->prevOut = output; // ¸üĞÂÉÏÒ»´ÎµÄÊä³öÖµ
+    filter->prevOut = output; // é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·ä¸€é”Ÿè½¿ç¢‰æ‹·é”Ÿæ–¤æ‹·é”Ÿè¡—ï¿½
     return output;
 }
 
@@ -170,6 +220,7 @@ void main(void)
     ADCB_init();
     initFilter(&filter, 800.0f,10000.0f);
     initFilter(&filter_force, 10.0f,10000.0f);
+    initFilter(&filter_force_derived, 400.0f,10000.0f);
 
     ScheduleDriveInit();
     memset(&ipcCPU2ToCPU1Data, 0, sizeof(ipcCPU2ToCPU1Data));
@@ -236,7 +287,7 @@ interrupt void TINT0_isr(void)
 int is_sin_wave = 0;
 static float32 TestFrHz= 0;
 
-float32 TestFr_Disturbance(void) {
+float32 TestFr_Disturbance(float32 curr_amp) {
     static float32 theata=0.0F;
     float32 TestFrDisturbance =0 ;
 
@@ -246,18 +297,18 @@ float32 TestFr_Disturbance(void) {
     }
     if(is_sin_wave )
     {
-        TestFrDisturbance = sinf(theata) * 1.5f; //__sin(theata);
+        TestFrDisturbance = sinf(theata) * curr_amp; //__sin(theata);
     }
     else
     {
-        TestFrDisturbance = (sinf(theata)> 0)? 1.5f:-1.5f; //__sin(theata);
+        TestFrDisturbance = (sinf(theata)> 0)? curr_amp:-curr_amp; //__sin(theata);
     }
 
     return TestFrDisturbance;
 }
 
 #define Ts 0.0001f
-float32 fh,x11,x11_pre = 0,x22,x22_pre = 0,h = 0.002f,r = 40000,xx11,xx22;
+float32 fh,x11,x11_pre = 0,x22,x22_pre = 0,h = 0.0005f,r = 20000,xx11,xx22,xxx2;
 
 int sign(float32 x)
 {
@@ -298,41 +349,43 @@ float32 fhan(float32 x1,float32 x2,float32 r,float32 h)
 
 void DifferentiateDiscreteSignal(float32 TorqueSensorDiffAd_pu)
 {
-    //·´À¡Î»ÖÃÎ¢·Ö
+    //é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·ä½é”Ÿæ–¤æ‹·å¾®é”Ÿæ–¤æ‹·
     fh = fhan(x11_pre - TorqueSensorDiffAd_pu,x22_pre,r,h);//
     x11 = x11_pre + Ts*x22_pre;
     x22 = x22_pre + Ts*fh;
     x11_pre = x11;
     x22_pre = x22;
     xx11 = x11;
-    xx22 = x22;
+    xx22 =x22;
+    xxx2 = x22;//applyFilter(&filter_force_derived,x22);
 }
 
 #define ReductionRatio 100
-#define KT 0.06f
-#define J  3.3572e-05f
-
-// ADRC²ÎÊı
+#define KT 0.024f
+#define J  2.68e-5f
+#define INERTIA 0.065510f
+#define MAX_CURRENT (22.f)
+// ADRCé”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·
 #define WC   150.0f
-#define WO  (5*WC)     /* ¹Û²âÆ÷´ø¿í */
-#define B0  (1*KT/J)      /* ¿ØÖÆÔöÒæ */
-#define KP  (WC*WC)    /* PD¿ØÖÆÆ÷P²ÎÊı */
-#define KD  (2*WC)     /* PD¿ØÖÆÆ÷D²ÎÊı */
+#define WO  (5*WC)     /* é”Ÿæ¡”è¯§æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹· */
+#define B0  (1*KT/J)      /* é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹· */
+#define KP  (WC*WC)    /* PDé”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·Pé”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹· */
+#define KD  (2*WC)     /* PDé”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·Dé”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹· */
 #define BETA1  (3.0f*WO)
 #define BETA2  (3*WO*WO)
 #define BETA3  (WO*WO*WO)
-#define DT  0.0001f    /* Ö´ĞĞÊ±¼ä²½³¤ */
+#define DT  0.0001f    /* æ‰§é”Ÿæ–¤æ‹·æ—¶é”Ÿæˆ’æ­¥é”Ÿæ–¤æ‹· */
 
 
-/* ESO×´Ì¬±äÁ¿ */
+/* ESOçŠ¶æ€é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹· */
 static float32 z1 = 0.0, z2 = 0.0, z3 = 0.0;
-/* ¿ØÖÆÊäÈë */
+/* é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹· */
 static float32 u = 0.0;
 
-/* ÏµÍ³Êä³ö */
+/* ç³»ç»Ÿé”Ÿæ–¤æ‹·é”Ÿï¿½ */
 static float32 y = 0.0;
 
-// ±»¿Ø¶ÔÏóÄ£ĞÍ
+// é”Ÿæ–¤æ‹·é”Ÿæˆªè®¹æ‹·é”Ÿæ–¤æ‹·æ¨¡é”Ÿæ–¤æ‹·
 void plant_model(float32 u, float32 *y, float32 *x1, float32 *x2)
 {
     float32 x1_dot, x2_dot;
@@ -346,7 +399,7 @@ void plant_model(float32 u, float32 *y, float32 *x1, float32 *x2)
     *y = *x1;
 }
 
-/* Èı½×ÏßĞÔESO */
+/* é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·ESO */
 void eso_update(float32 r, float32 y_m)
 {
     float32 z1_dot, z2_dot, z3_dot;
@@ -361,7 +414,7 @@ void eso_update(float32 r, float32 y_m)
 
 
 }
-// PD¿ØÖÆÂÉ
+// PDé”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·
 float32 pd_control(float32 r, float32 z1, float32 z2)
 {
     float32 u0, e;
@@ -372,7 +425,7 @@ float32 pd_control(float32 r, float32 z1, float32 z2)
     return u0;
 }
 
-// ¿ØÖÆÂÉ
+// é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·
 float32 adrc_control(float32 r, float32 z1, float32 z2, float32 z3)
 {
     float32 u0, u;
@@ -380,13 +433,13 @@ float32 adrc_control(float32 r, float32 z1, float32 z2, float32 z3)
     u0 = pd_control(r, z1, z2);
     u = (-z3 + u0)/B0;  //-z3
 
-    if(u > 5)
+    if(u > 15)
     {
-        u = 5;
+        u = 15;
     }
-    if( u < -5)
+    if( u < -15)
     {
-        u = -5;
+        u = -15;
     }
 
     return u;
@@ -402,24 +455,157 @@ static float32 last_buf_12 = 0;
 static int is_TorqueSensorDiffAd_stable_ = 0;
 
 
+#define  wn 1000
+
+float dw_est = 0;
+float dTl = 0;
+float Te = 0;
+float Tl = 0;
+float B = 0;
+float g1 = 2*wn;
+float g2 = -1*J * wn *wn;
+float w = 0;
+float w_est = 0;
+
+
+
+void luenberger_load_observer(void)
+{
+    dw_est = (Te- Tl - B*w + g1*J*(w - w_est))/J;
+    dTl = g2*(w - w_est);
+
+    Tl += dTl * DT;
+    w_est += dw_est *DT;
+}
+
+
+
+
 void timer_callbakc(void)
 {
     is_TorqueSensorDiffAd_stable_ = 1;
 }
+
+
+enum {
+    MOTOR_IDLE = 0,
+    MOTOR_CURR = 1,
+    MOTOR_IMPEDANCE = 2,
+    MOTOR_SPEED =3,
+    MOTOR_GRAVITY_COMPENSATION = 4,
+};
 
 typedef enum
 {
     TEST =0,
     INTER =1,
     ADRC =2,
+    DEMO_TEST_force_resolution,
+    DEMO_TEST_arcmin,
+    DEMO_TEST_Nm_per_arcmin,
+
 
 } TORQUE_SOURCE;
-TORQUE_SOURCE torque_source  = INTER;
+TORQUE_SOURCE torque_source  = INTER ;
+
+
+
 
 static float32 Kp = 250.0f;
-static float32 Kd =0.01f;
+static float32 Kd =1.0f;
 static int erro_cnt = 0;
 static int  TorqueSensorDiffAd_stable_cnt = 0;
+float32  actual_positon = 0;
+float32 postion_offset = 4.0f;
+int stu_time = 0;
+float32 gravity = 0;
+float32 user_torque_setpoint = 0.f;
+int speed_stop_flag_ =0;
+float32 friction_force =0;
+float32 TorqueSensorDiffAd_estimate =0;
+float32 delta_TorqueSensorDiffAd = 0;
+float32 TorqueSensorDiffAd_derived = 0;
+typedef struct {
+
+    float32 amplify;
+    float32 ramp_period;
+    float32 current;
+    float32 t;
+    float32 ramp_rising_time;
+    float32 ramp_step;
+} RampGenerator;
+#define RAMP_MAX (0.7f)
+RampGenerator ramp_generator_= 
+{
+    .amplify =RAMP_MAX,
+    .ramp_period = 10.f,
+    .current = -RAMP_MAX,
+    .t = 0.0f,
+    .ramp_rising_time = 10.0/2.f,
+    .ramp_step = 4*RAMP_MAX * DT / 10.0f,
+};
+
+#define RAMP_PERIOD 0.1f
+
+RampGenerator force_ramp_generator_= 
+{
+    .amplify =RAMP_MAX,
+    .ramp_period = RAMP_PERIOD,
+    .current = 0.f,
+    .t = 0.0f,
+    .ramp_rising_time = RAMP_PERIOD/2.f,
+    .ramp_step = 2*RAMP_MAX * DT / RAMP_PERIOD,
+};
+
+float32 ramp_update(RampGenerator *ramp_generator)
+{
+
+if(ramp_generator->t < ramp_generator->ramp_rising_time/2.f)
+{
+    ramp_generator->current += ramp_generator->ramp_step;
+}
+else if( ramp_generator->t < ramp_generator->ramp_rising_time)
+{
+    ramp_generator->current -= ramp_generator->ramp_step;
+}
+else if( ramp_generator->t < 3*ramp_generator->ramp_rising_time/2)
+{
+    ramp_generator->current -= ramp_generator->ramp_step;
+}
+else if( ramp_generator->t < 2*ramp_generator->ramp_rising_time)
+{
+    ramp_generator->current += ramp_generator->ramp_step;
+}
+else
+{
+    ramp_generator->current = 0;
+    ramp_generator->t = 0;
+}
+ramp_generator->t += DT;
+return ramp_generator->current;
+}
+
+#define STEP_FORCE_MAX 0.339f
+float32 step_update(RampGenerator *ramp_generator)
+{
+    if(ramp_generator->t < ramp_generator->ramp_rising_time)
+    {
+        ramp_generator->current = STEP_FORCE_MAX;
+    }
+    else if( ramp_generator->t < 2*ramp_generator->ramp_rising_time)
+    {
+        ramp_generator->current = 0;
+    }
+    else
+    {
+        ramp_generator->current = 0;
+        ramp_generator->t = 0;
+    }
+    ramp_generator->t += DT;
+    return ramp_generator->current;
+}
+
+static float now_TargetTorque_Nm_filter = 0;
 #pragma CODE_SECTION(CIPC1_INT_isr, ".TI.ramfunc");
 interrupt void CIPC1_INT_isr(void)
 {
@@ -430,16 +616,18 @@ interrupt void CIPC1_INT_isr(void)
   ADC_forceMultipleSOC(ADCB_BASE, (ADC_FORCE_SOC0 | ADC_FORCE_SOC1 | ADC_FORCE_SOC2 | ADC_FORCE_SOC3));
   CycleLoadTimerCalcBegin(&Task50usTime);
 
+    float32 pll_kp_ = 2.0f * 2000;
+    float32 pll_ki_ = 0.25f * (pll_kp_ * pll_kp_);;
+    float32 torque_base = 118.0f;
+    float32 ADC_FULL_SCALE = 2048.f;
 
-  float32 torque_base = 1024.f;
-  float32 user_torque_setpoint  =0.0f;
   float32 erro = 0;
   float32 derivative  = 0;
   float32 TorqueSensorDiffAd_origin = 0;
-
-
-  { //Êı¾İ´«Êä±ØĞëÔÚ50usÈÎÎñ¿ªÊ¼´«Êä
-      //»ñÈ¡CPU1Êı¾İ
+  float32 motor_control_mode = MOTOR_CURR;
+  float32 load_M =  1.88087f;
+  { //é”Ÿæ–¤æ‹·é”Ÿæ·è¾¾æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿï¿½50usé”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·å§‹é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·
+      //é”Ÿæ–¤æ‹·å–CPU1é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·
       GetDatBuff[0] = ipcCPU1ToCPU2Data.MotorAxisEncoder_rad;
       GetDatBuff[1] = ipcCPU1ToCPU2Data.AllCloseLoopEncoder_rad;
       GetDatBuff[2] = ipcCPU1ToCPU2Data.MotorAxisEncoderSpeed_radps;
@@ -448,37 +636,41 @@ interrupt void CIPC1_INT_isr(void)
       GetDatBuff[5] = ipcCPU1ToCPU2Data.TorqueSensor_Nm; //
       GetDatBuff[6] = ipcCPU1ToCPU2Data.TargetPos_rad;
       GetDatBuff[7] = ipcCPU1ToCPU2Data.TargetSpeed_radps;
-      GetDatBuff[8] = ipcCPU1ToCPU2Data.TargetTorque_Nm; // ËÙ¶È»·PIÊä³ö
+      GetDatBuff[8] = ipcCPU1ToCPU2Data.TargetTorque_Nm; // é”ŸåŠ«åº¦ä¼™æ‹·PIé”Ÿæ–¤æ‹·é”Ÿï¿½
       GetDatBuff[9] = ipcCPU1ToCPU2Data.PosCtrlKp;
       GetDatBuff[10] = ipcCPU1ToCPU2Data.PosCtrlKi;
       GetDatBuff[11] = ipcCPU1ToCPU2Data.PosCtrlKd;
+      GetParm[(short)GetDatBuff[10]] = GetDatBuff[11];
       GetDatBuff[12] = ipcCPU1ToCPU2Data.Reserve1; // 3001-17
-      GetDatBuff[13] = ipcCPU1ToCPU2Data.Reserve2; //±£Áô
-      GetDatBuff[14] = ipcCPU1ToCPU2Data.Reserve3; //±£Áô
+      GetDatBuff[13] = ipcCPU1ToCPU2Data.Reserve2; //é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·
+      GetDatBuff[14] = ipcCPU1ToCPU2Data.Reserve3; //é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·
       GetDatBuff[15] = TorqueSensorDiffAdSample * 3.3F * 0.00001526F;
       GetDatBuff[16] = TorqueSensorSigleAdSample * 3.3F * 0.00001526F;
       GetDatBuff[17] = Task50usTime.CycleTime_us;
       GetDatBuff[18] = Task50usTime.LoadTime_us;
 
+      w =GetDatBuff[2];
+      Te = GetDatBuff[4]*KT;
+
+
       is_target_current_control_by_cpu2 = (GetDatBuff[12] > 1)?  1 : 0;
       last_TargetTorque_Nm  = ipcCPU1ToCPU2Data.TargetTorque_Nm;
 
-
-      { //Á¦¾Ø²ÉÑù´¦Àí
+      { //é”Ÿæ–¤æ‹·é”Ÿæˆªè¯§æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·
 
 
           TorqueSensorSumTick++;
           if(TorqueSensorSumTick > 1){
 
-              TorqueSensorDiffAd_origin = TorqueSensorDiffAdSample; //»ñÈ¡²î·ÖÁ¦¾ØAD
-              TorqueSensorSigleAd = TorqueSensorSigleAdSample; //»ñÈ¡µ¥¶ËÁ¦¾ØAD
+              TorqueSensorDiffAd_origin = TorqueSensorDiffAdSample; //é”Ÿæ–¤æ‹·å–é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿç´¸D
+              TorqueSensorSigleAd = TorqueSensorSigleAdSample; //é”Ÿæ–¤æ‹·å–é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·AD
               TorqueSensorSumTick = 0;
               TorqueSensorDiffAdSum = 0;
               TorqueSensorSigleAdSum = 0;
 
               TorqueSensorDiffAd =  applyFilter(&filter,TorqueSensorDiffAd_origin);
 
-
+              luenberger_load_observer();
 
               if(  last_buf_12 != get_test_fre())
               {
@@ -486,12 +678,15 @@ interrupt void CIPC1_INT_isr(void)
                   TorqueSensorDiffAd_stable_cnt ++;
                   if(TorqueSensorDiffAd_stable_cnt > 100)
                   {
+                      Tl = 0;
                       z1 = 0;
                       z2 = 0;
                       z3 = 0;
                       TorqueSensorDiffAd_stable_cnt = 0;
                       last_buf_12 = get_test_fre();
-                      diff_torque_offset += TorqueSensorDiffAd_pu_filter * torque_base;
+                      diff_torque_offset += TorqueSensorDiffAd_pu_filter * ADC_FULL_SCALE;
+                      postion_offset = GetDatBuff[1];
+
                   }
 
 
@@ -508,7 +703,7 @@ interrupt void CIPC1_INT_isr(void)
               TorqueSensorDiffAd -= diff_torque_offset;
               TorqueSensorSigleAd -= single_torque_offset;
 
-              TorqueSensorDiffAd_pu = TorqueSensorDiffAd/torque_base;
+              TorqueSensorDiffAd_pu = TorqueSensorDiffAd/ADC_FULL_SCALE;
               TorqueSensorDiffAd_pu_filter = applyFilter(&filter_force,TorqueSensorDiffAd_pu);
               if(TorqueSensorDiffAd_pu > 0.5f  || TorqueSensorDiffAd_pu < -0.5f)
               {
@@ -517,56 +712,156 @@ interrupt void CIPC1_INT_isr(void)
                  //     while(1);
               }
 
-              //ÌáÈ¡Î¢·ÖĞÅºÅ
+              //é”Ÿæ–¤æ‹·å–å¾®é”Ÿæ–¤æ‹·é”Ÿè„šçŒ´æ‹·
 
 
-              float32 friction_force = calculate_friction_force(GetDatBuff[2] *10.0f);
+               friction_force = calculate_friction_force(GetDatBuff[2]);
+             // friction_force  = Tl /0.03f;
+              float32 positon_kp = GetParm[3]/100.f;
+              float32  speed_kd = GetParm[4]/10000.f;
+              Kp = GetParm[MOTOR_PARM_TKP]/100.f;
+              Kd = GetParm[MOTOR_PARM_TKD]/1000.f;
+              float32 pos_ref =0;
+              float32 w_ref=0;
+
+
+            actual_positon = GetDatBuff[1]-postion_offset;
+
+            actual_positon = 0 - actual_positon;
+            while( actual_positon > M_PI) actual_positon = actual_positon - 2*M_PI;
+            while( actual_positon < -M_PI) actual_positon = actual_positon + 2*M_PI;
+
               switch(torque_source)
               {
                   case TEST:
                       TestFrHz = get_test_fre();
-                       now_TargetTorque_Nm = TestFr_Disturbance();
+                       now_TargetTorque_Nm = TestFr_Disturbance(1.0f);
+                       //DifferentiateDiscreteSignal(TorqueSensorDiffAd_pu);
+                       TorqueSensorDiffAd_estimate += 0.0001f * TorqueSensorDiffAd_derived;
+                       delta_TorqueSensorDiffAd =  TorqueSensorDiffAd - TorqueSensorDiffAd_estimate;
+                      TorqueSensorDiffAd_estimate += 0.0001f * pll_kp_ * delta_TorqueSensorDiffAd;
+                      TorqueSensorDiffAd_derived += 0.0001f * pll_ki_ * delta_TorqueSensorDiffAd;
+
                   break;
 
                   case INTER:
+                        motor_control_mode = GetParm[6];
+                        gravity= -1.0f*load_M *sinf( (GetDatBuff[1]>postion_offset)? (GetDatBuff[1]-postion_offset) : (2*M_PI + GetDatBuff[1]-postion_offset) );
+                      //  friction_force = friction_force - gravity/ReductionRatio;
+                        if(motor_control_mode == MOTOR_IMPEDANCE)
+                        {
+
+                            if(last_traj_position_flag != GetParm[5] )
+                            {
+                                t_ = 0;
+                                last_traj_position_flag =GetParm[5]  ;
+                                phi_ = actual_positon;
+                                traj_start_ =1 ;
+                            }
+                            float32  omega = 2*M_PI*GetParm[MOTOR_PARM_POS_FRE];
+                            traj(omega);
+                             
+                            user_torque_setpoint = positon_kp*(position_ -actual_positon) + speed_kd*( velocity_*50.f - w) + gravity/torque_base + acceleration_*INERTIA/torque_base;
+                        }
+                        else if(motor_control_mode == MOTOR_SPEED)
+                        {
+                            w_ref = GetParm[MOTOR_PARM_SPEED_SETPOINT];
+                            user_torque_setpoint = speed_kd*( w_ref - w) ;// + gravity/torque_base;
+                            if(0)// TorqueSensorDiffAd_pu*torque_base > gravity+0.3f )
+                            {
+                                stu_time++;
+                                if(stu_time > 400)
+                                {
+                                    speed_stop_flag_ =1;
+                                }
+
+                            }
+                            else
+                            {
+                                stu_time =0;
+
+                            }
+
+                            if(speed_stop_flag_ ==1)
+                            {
+                                user_torque_setpoint =(gravity)/torque_base;
+                            }
+
+
+                        }
+                        else if(motor_control_mode==MOTOR_GRAVITY_COMPENSATION)
+                        {
+                            user_torque_setpoint = gravity/torque_base;
+                        }
+                        else if(motor_control_mode==MOTOR_CURR)
+                        {
+                          //  TestFrHz = GetParm[0];
+                          //  user_torque_setpoint = GetParm[MOTOR_PARM_torque_SETPOINT]*TestFr_Disturbance(1.0f)/ADC_FULL_SCALE +  gravity/torque_base;
+                            user_torque_setpoint = step_update(&force_ramp_generator_);
+                        }
+                        else if(motor_control_mode==MOTOR_IDLE)
+                        {
+                            speed_stop_flag_ =0;
+                            traj_start_ =0;
+                            last_traj_position_flag =GetParm[5] ;
+                            user_torque_setpoint = gravity/torque_base;
+                        }
+
+
                        erro = user_torque_setpoint - TorqueSensorDiffAd_pu;
-                       DifferentiateDiscreteSignal(erro);
-                       derivative  = xx22;
-                      now_TargetTorque_Nm = Kp * erro + Kd *derivative + friction_force +  user_torque_setpoint/ (KT * ReductionRatio) ;
+                      // DifferentiateDiscreteSignal(erro);
+                      // derivative  = xxx2;
+                       TorqueSensorDiffAd_estimate += 0.0001f * TorqueSensorDiffAd_derived;
+                       delta_TorqueSensorDiffAd =  erro - TorqueSensorDiffAd_estimate;
+                      TorqueSensorDiffAd_estimate += 0.0001f * pll_kp_ * delta_TorqueSensorDiffAd;
+                      TorqueSensorDiffAd_derived += 0.0001f * pll_ki_ * delta_TorqueSensorDiffAd;
+                      derivative  = TorqueSensorDiffAd_derived;
+                      now_TargetTorque_Nm = Kp * erro + Kd *derivative + user_torque_setpoint*torque_base/(KT * ReductionRatio) + friction_force ;//+ friction_force;// gravity/(KT * ReductionRatio);// + friction_force ;//+  gravity_compensation/ (KT * ReductionRatio) ; 1.0375,0.065510 0.1779
+                      now_TargetTorque_Nm = LIMIT(now_TargetTorque_Nm, MAX_CURRENT, -MAX_CURRENT);
+                      now_TargetTorque_Nm_filter += 0.2f * (now_TargetTorque_Nm - now_TargetTorque_Nm_filter);
                       break;
                   case ADRC:
-                      r = 0;
+                      r = user_torque_setpoint;
                       y = TorqueSensorDiffAd_pu;
                       eso_update(r, y);
                       u = adrc_control(r, z1, z2, z3);
                       now_TargetTorque_Nm = u;
                       break;
+                 case DEMO_TEST_arcmin:
+
+                       now_TargetTorque_Nm = ramp_update(&ramp_generator_);
+
+                      break;
                   default:
                   break;
               }
+              
 
           }
 
       }
 
-
-
+      
+      
       if( is_target_current_control_by_cpu2 )
       {
-          if(last_TargetTorque_Nm != now_TargetTorque_Nm)
+
+          if(last_TargetTorque_Nm != now_TargetTorque_Nm_filter)
           {
-              ipcCPU2ToCPU1Data.TargetCurrent_A = now_TargetTorque_Nm;  //µçÁ÷»·¸ø¶¨Öµ A   0.5->0x3000 -7  6.0->0x3000-4
+            
+            ipcCPU2ToCPU1Data.TargetCurrent_A = now_TargetTorque_Nm_filter;  //é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·å€¼ A   0.5->0x3000 -7  6.0->0x3000-4
           }
           else
           {
-              //set erro: ²»ÄÜÊÇÏàÍ¬Öµ
+              //set erro: é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·åŒå€¼
           }
           ipcCPU2ToCPU1Data.LifeTick++;
       }
 
-      ipcCPU2ToCPU1Data.Reserve1 = 0.0f-TorqueSensorDiffAd_pu;// ipcCPU1ToCPU2Data.TargetTorque_Nm*1000/7; //¼à¿Ø4
-      ipcCPU2ToCPU1Data.Reserve2 = xx22;//xx22;//Task50usTime.CycleTime_us;//¼à¿Ø5
-      ipcCPU2ToCPU1Data.Reserve3 = Task50usTime.LoadTime_us; //±£Áô
+
+      ipcCPU2ToCPU1Data.Reserve1 = (TorqueSensorDiffAd_pu)*torque_base;//now_TargetTorque_Nm_filter;//(TorqueSensorDiffAd_pu)*torque_base;//position_*180.f/M_PI;// velocity_*1500.f/M_PI;//  position_*180.f/M_PI;//(user_torque_setpoint)*torque_base;//now_TargetTorque_Nm*KT * ReductionRatio;//GetParm[0];//TorqueSensorDiffAd_pu*torque_base;// ipcCPU1ToCPU2Data.TargetTorque_Nm*1000/7; -1*9.8f*1.0375f*0.1779f
+      ipcCPU2ToCPU1Data.Reserve2 = (user_torque_setpoint)*torque_base;//now_TargetTorque_Nm;//(user_torque_setpoint)*torque_base;//actual_positon*180.f/M_PI;// w*30.f/M_PI;//actual_positon*180.f/M_PI;//TorqueSensorDiffAd_pu * torque_base;//TorqueSensorDiffAd_pu*torque_base;//xx22*torque_base;//xx22;//Task50usTime.CycleTime_us;//é”Ÿæ–¤æ‹·é”Ÿï¿½5
+      ipcCPU2ToCPU1Data.Reserve3 = Task50usTime.LoadTime_us; //é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·
 
 
 
@@ -577,7 +872,7 @@ interrupt void CIPC1_INT_isr(void)
 
   //Current loop sycn Task here...50us
   {
-      //Á¦¾ØËã·¨µ¥ÅÄ30usÄÚÍê³É£¬¿É·ÖÅÄ¼ÆËã¡£¡£¡£
+      //é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·é”Ÿå§æ³•é”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·30usé”Ÿæ–¤æ‹·é”Ÿæ–¤æ‹·æ¡‘é”Ÿæ–¤æ‹·ç…é”Ÿæ–¤æ‹·å‹Ÿé”Ÿæ–¤æ‹·æªï½æ‹·é”Ÿæ–¤æ‹·é”Ÿï¿½
 
   }
 
@@ -777,5 +1072,4 @@ void ADCB_init(){
     ADC_enableContinuousMode(ADCB_BASE, ADC_INT_NUMBER1);
     ADC_enableInterrupt(ADCB_BASE, ADC_INT_NUMBER1);
 }
-
 
