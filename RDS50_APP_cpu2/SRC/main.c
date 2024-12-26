@@ -14,6 +14,7 @@
 #define IFRMASK                        1
 
 
+float32 system_time_ = 0.0f;
 
 float32 GetParm[48];
 enum MOTOR_PARM_E
@@ -41,6 +42,7 @@ enum MOTOR_PARM_E
  锟斤拷锟斤拷锟斤拷锟斤拷转锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷去锟斤拷锟� 锟皆匡拷锟脚观诧拷锟斤拷锟剿★拷
  * *
  */
+
 float32 t_ =0.f;
 float32  omega_ = 2*M_PI*10.0f;
 float32 acceleration_ = 0.f;
@@ -826,10 +828,21 @@ interrupt void CIPC1_INT_isr(void)
                             traj_start_ =0;
                             last_traj_position_flag =GetParm[5] ;
                             user_torque_setpoint = gravity/torque_base;
+                            
+                            step_reset(&step_signal_,system_time_);
+
                         }
                         else if(motor_control_mode == Motor_FORCE_STEP_TEST)
                         {
-                            user_torque_setpoint
+                            if( step_update(&step_signal_,system_time_+10.0f,system_time_) == true )
+                            {
+                                user_torque_setpoint = step_signal_.target_pos;
+                            }
+                            else
+                            {
+                                user_torque_setpoint = 0.0f;
+                            }
+                            
                         }
 
                        erro = user_torque_setpoint - TorqueSensorDiffAd_pu;

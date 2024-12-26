@@ -13,6 +13,8 @@ typedef struct
     float target_pos;   // End position
 } StepSignal;
 
-
+extern StepSignal step_signal_;
+void step_reset(StepSignal *signal,const float system_time);
+bool step_update(StepSignal *signal,  const float T, const float system_time);
 
 #endif
