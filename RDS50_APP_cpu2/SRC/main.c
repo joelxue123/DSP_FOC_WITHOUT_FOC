@@ -502,6 +502,7 @@ enum {
     MOTOR_SPEED =3,
     MOTOR_GRAVITY_COMPENSATION = 4,
     MOTOR_POS_CHIRP = 5,
+    Motor_FORCE_STEP = 6,
 };
 
 typedef enum
