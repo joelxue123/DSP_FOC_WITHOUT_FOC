@@ -3,6 +3,7 @@
         "makefile": "makefile",
         "device.h": "c",
         "type_traits": "cpp",
-        "limits": "cpp"
+        "limits": "cpp",
+        "test_motor.h": "c"
     }
 }

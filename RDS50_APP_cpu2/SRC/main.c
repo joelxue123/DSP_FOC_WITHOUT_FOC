@@ -502,7 +502,7 @@ enum {
     MOTOR_SPEED =3,
     MOTOR_GRAVITY_COMPENSATION = 4,
     MOTOR_POS_CHIRP = 5,
-    Motor_FORCE_STEP = 6,
+    Motor_FORCE_STEP_TEST = 6,
 };
 
 typedef enum
@@ -827,7 +827,10 @@ interrupt void CIPC1_INT_isr(void)
                             last_traj_position_flag =GetParm[5] ;
                             user_torque_setpoint = gravity/torque_base;
                         }
-
+                        else if(motor_control_mode == Motor_FORCE_STEP_TEST)
+                        {
+                            user_torque_setpoint
+                        }
 
                        erro = user_torque_setpoint - TorqueSensorDiffAd_pu;
                       // DifferentiateDiscreteSignal(erro);
