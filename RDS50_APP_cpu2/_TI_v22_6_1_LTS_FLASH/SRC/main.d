@@ -186,6 +186,8 @@ SRC/main.obj: C:/ti/ccs1250/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include/x
 SRC/main.obj: C:/ti/ccs1250/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include/math.h
 SRC/main.obj: C:/ti/ccs1250/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include/_defs.h
 SRC/main.obj: C:/ti/ccs1250/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include/machine/_limits.h
+SRC/main.obj: C:/work/workspace/RDS50_APP_cpu2/SRC/ultis.h
+SRC/main.obj: C:/work/workspace/RDS50_APP_cpu2/SRC/board.h
 
 ../SRC/main.c:
 
@@ -558,4 +560,8 @@ C:/ti/ccs1250/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include/math.h:
 C:/ti/ccs1250/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include/_defs.h:
 
 C:/ti/ccs1250/ccs/tools/compiler/ti-cgt-c2000_22.6.1.LTS/include/machine/_limits.h:
+
+C:/work/workspace/RDS50_APP_cpu2/SRC/ultis.h:
+
+C:/work/workspace/RDS50_APP_cpu2/SRC/board.h:
 

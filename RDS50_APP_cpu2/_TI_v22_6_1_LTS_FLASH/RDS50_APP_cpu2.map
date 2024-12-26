@@ -1,7 +1,7 @@
 ******************************************************************************
              TMS320C2000 Linker PC v22.6.1                     
 ******************************************************************************
->> Linked Wed Oct 23 15:12:07 2024
+>> Linked Tue Nov 26 14:52:48 2024
 
 OUTPUT FILE NAME:   <RDS50_APP_cpu2.out>
 ENTRY POINT SYMBOL: "code_start"  address: 000e0000
@@ -19,14 +19,14 @@ PAGE 0:
   CPUTOCLARAM           00001500   00000080  00000000  00000080  RWIX
   CLATODMARAM           00001680   00000080  00000000  00000080  RWIX
   DMATOCLARAM           00001700   00000080  00000000  00000080  RWIX
-  RAMGS_DATA            00010000   00004000  0000017b  00003e85  RWIX
-  RAMGS_PROG            00014000   00006000  000005db  00005a25  RWIX
+  RAMGS_DATA            00010000   00004000  0000018b  00003e75  RWIX
+  RAMGS_PROG            00014000   00006000  00000672  0000598e  RWIX
   CPU1TOCPU2RAM         0003a000   00000800  000000a6  0000075a  RWIX
   CPU2TOCPU1RAM         0003b000   00000800  00000092  0000076e  RWIX
   CANA_MSG_RAM          00049000   00000800  00000000  00000800  RWIX
   CANB_MSG_RAM          0004b000   00000800  00000000  00000800  RWIX
   BEGIN                 000e0000   00000002  00000002  00000000  RWIX
-  FLASH_ALL_SEC         000e0002   0003fffe  0000262e  0003d9d0  RWIX
+  FLASH_ALL_SEC         000e0002   0003fffe  000027ed  0003d811  RWIX
   RESET                 003fffc0   00000002  00000000  00000002  RWIX
 
 PAGE 1:
@@ -221,24 +221,25 @@ codestart
 *          0    000e0000    00000002     
                   000e0000    00000002     f28p65x_codestartbranch.obj (codestart)
 
-.cinit     0    000e25f8    0000004e     
-                  000e25f8    0000003b     (.cinit..data.load) [load image, compression = lzss]
-                  000e2633    00000001     --HOLE-- [fill = 0]
-                  000e2634    00000006     (__TI_handler_table)
-                  000e263a    00000004     (.cinit..bss.load) [load image, compression = zero_init]
-                  000e263e    00000008     (__TI_cinit_table)
+.cinit     0    000e27b8    0000004e     
+                  000e27b8    0000003b     (.cinit..data.load) [load image, compression = lzss]
+                  000e27f3    00000001     --HOLE-- [fill = 0]
+                  000e27f4    00000006     (__TI_handler_table)
+                  000e27fa    00000004     (.cinit..bss.load) [load image, compression = zero_init]
+                  000e27fe    00000008     (__TI_cinit_table)
 
 .reset     0    003fffc0    00000000     DSECT
 
 .stack     0    00000400    00000400     UNINITIALIZED
                   00000400    00000400     --HOLE--
 
-.bss       0    00010000    000000d8     UNINITIALIZED
+.bss       0    00010000    000000e8     UNINITIALIZED
                   00010000    00000060     main.obj (.bss:GetParm)
                   00010060    00000018     f28p65x_cputimers.obj (.bss)
                   00010078    00000008     --HOLE--
                   00010080    00000030     main.obj (.bss)
                   000100b0    00000028     main.obj (.bss:GetDatBuff)
+                  000100d8    00000010     ultis.obj (.bss)
 
 .init_array 
 *          0    000e0008    00000000     UNINITIALIZED
@@ -254,7 +255,8 @@ codestart
                   000e0008    00000008     rts2800_fpu32_eabi.lib : e_exp.c.obj (.const:halF)
                   000e0010    00000008                            : e_exp.c.obj (.const:ln2HI)
                   000e0018    00000008                            : e_exp.c.obj (.const:ln2LO)
-                  000e0020    00000020     --HOLE-- [fill = 0]
+                  000e0020    00000004     main.obj (.const)
+                  000e0024    0000001c     --HOLE-- [fill = 0]
                   000e0040    000001c0     f28p65x_pievect.obj (.const)
                   000e0200    00000060     rts2800_fpu32_eabi.lib : e_exp.c.obj (.const)
                   000e0260    00000044     ipc.obj (.const:IPC_Instance)
@@ -270,12 +272,12 @@ MSGRAM_CPU2_TO_CPU1
                   0003b088    0000000a     main.obj (MSGRAM_CPU2_TO_CPU1)
 
 .TI.ramfunc 
-*          0    000e2018    000005db     RUN ADDR = 00014000
-                  000e2018    0000052a     main.obj (.TI.ramfunc:retain)
-                  000e2542    0000008a     flash.obj (.TI.ramfunc)
-                  000e25cc    0000001f     f28p65x_sysctrl.obj (.TI.ramfunc)
-                  000e25eb    00000004     f28p65x_usdelay.obj (.TI.ramfunc)
-                  000e25ef    00000004     sysctl.obj (.TI.ramfunc)
+*          0    000e2140    00000672     RUN ADDR = 00014000
+                  000e2140    000005c1     main.obj (.TI.ramfunc:retain)
+                  000e2701    0000008a     flash.obj (.TI.ramfunc)
+                  000e278b    0000001f     f28p65x_sysctrl.obj (.TI.ramfunc)
+                  000e27aa    00000004     f28p65x_usdelay.obj (.TI.ramfunc)
+                  000e27ae    00000004     sysctl.obj (.TI.ramfunc)
 
 AdcbResultRegsFile 
 *          1    00000a80    00000048     UNINITIALIZED
@@ -321,45 +323,46 @@ WdRegsFile
 *          1    00007000    0000002b     UNINITIALIZED
                   00007000    0000002b     f28p65x_globalvariabledefs.obj (WdRegsFile)
 
-.text      0    000e02a8    00001d69     
+.text      0    000e02a8    00001e91     
                   000e02a8    000007dd     f28p65x_defaultisr.obj (.text:retain)
-                  000e0a85    0000075d     main.obj (.text)
-                  000e11e2    0000027b     rts2800_fpu32_eabi.lib : e_exp.c.obj (.text)
-                  000e145d    000001ec     ipc.obj (.text)
-                  000e1649    000001cd     adc.obj (.text)
-                  000e1816    000001a7     f28p65x_sysctrl.obj (.text)
-                  000e19bd    00000173     interrupt.obj (.text)
-                  000e1b30    0000009c     rts2800_fpu32_eabi.lib : fd_add28.asm.obj (.text)
-                  000e1bcc    0000008b                            : fd_div28.asm.obj (.text)
-                  000e1c57    00000083                            : fd_mpy28.asm.obj (.text)
-                  000e1cda    0000007c     f28p65x_cputimers.obj (.text)
-                  000e1d56    00000042     main.obj (.text:CycleLoadTimerCalcEnd)
-                  000e1d98    00000030     rts2800_fpu32_eabi.lib : copy_decompress_lzss.c.obj (.text:decompress:lzss)
-                  000e1dc8    0000002b                            : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit)
-                  000e1df3    0000002a     interrupt.obj (.text:retain)
-                  000e1e1d    0000002a     rts2800_fpu32_eabi.lib : fd_cmp28.asm.obj (.text)
-                  000e1e47    00000029                            : exit.c.obj (.text)
-                  000e1e70    00000028     f28p65x_piectrl.obj (.text)
-                  000e1e98    00000026     f28p65x_pievect.obj (.text)
-                  000e1ebe    00000023     rts2800_fpu32_eabi.lib : fd_tofsfpu32.asm.obj (.text)
-                  000e1ee1    00000022     main.obj (.text:CycleLoadTimerCalcBegin)
-                  000e1f03    00000021     rts2800_fpu32_eabi.lib : fd_toi28.asm.obj (.text)
-                  000e1f24    0000001f     flash.obj (.text)
-                  000e1f43    0000001d     rts2800_fpu32_eabi.lib : memcpy.c.obj (.text)
-                  000e1f60    0000001c                            : fs_tofdfpu32.asm.obj (.text)
-                  000e1f7c    0000001c                            : l_tofd28.asm.obj (.text)
-                  000e1f98    00000017                            : boot28.asm.obj (.text)
-                  000e1faf    0000000e                            : fd_sub28.asm.obj (.text)
-                  000e1fbd    0000000d                            : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init_nomemset)
-                  000e1fca    0000000c                            : args_main.c.obj (.text)
-                  000e1fd6    0000000b     rtFrwUtilities.obj (.text:__relaxed_cosf)
-                  000e1fe1    0000000b     rtFrwUtilities.obj (.text:__relaxed_sinf)
-                  000e1fec    00000009     rtFrwUtilities.obj (.text:__relaxed_sqrtf)
-                  000e1ff5    00000009     rts2800_fpu32_eabi.lib : _lock.c.obj (.text)
-                  000e1ffe    00000008                            : copy_decompress_none.c.obj (.text:decompress:none)
-                  000e2006    00000008     f28p65x_codestartbranch.obj (.text)
-                  000e200e    00000002     rts2800_fpu32_eabi.lib : pre_init.c.obj (.text)
-                  000e2010    00000001                            : startup.c.obj (.text)
+                  000e0a85    0000075f     main.obj (.text)
+                  000e11e4    0000027b     rts2800_fpu32_eabi.lib : e_exp.c.obj (.text)
+                  000e145f    000001ec     ipc.obj (.text)
+                  000e164b    000001cd     adc.obj (.text)
+                  000e1818    000001a7     f28p65x_sysctrl.obj (.text)
+                  000e19bf    00000173     interrupt.obj (.text)
+                  000e1b32    00000126     ultis.obj (.text)
+                  000e1c58    0000009c     rts2800_fpu32_eabi.lib : fd_add28.asm.obj (.text)
+                  000e1cf4    0000008b                            : fd_div28.asm.obj (.text)
+                  000e1d7f    00000083                            : fd_mpy28.asm.obj (.text)
+                  000e1e02    0000007c     f28p65x_cputimers.obj (.text)
+                  000e1e7e    00000042     main.obj (.text:CycleLoadTimerCalcEnd)
+                  000e1ec0    00000030     rts2800_fpu32_eabi.lib : copy_decompress_lzss.c.obj (.text:decompress:lzss)
+                  000e1ef0    0000002b                            : autoinit.c.obj (.text:__TI_auto_init_nobinit_nopinit)
+                  000e1f1b    0000002a     interrupt.obj (.text:retain)
+                  000e1f45    0000002a     rts2800_fpu32_eabi.lib : fd_cmp28.asm.obj (.text)
+                  000e1f6f    00000029                            : exit.c.obj (.text)
+                  000e1f98    00000028     f28p65x_piectrl.obj (.text)
+                  000e1fc0    00000026     f28p65x_pievect.obj (.text)
+                  000e1fe6    00000023     rts2800_fpu32_eabi.lib : fd_tofsfpu32.asm.obj (.text)
+                  000e2009    00000022     main.obj (.text:CycleLoadTimerCalcBegin)
+                  000e202b    00000021     rts2800_fpu32_eabi.lib : fd_toi28.asm.obj (.text)
+                  000e204c    0000001f     flash.obj (.text)
+                  000e206b    0000001d     rts2800_fpu32_eabi.lib : memcpy.c.obj (.text)
+                  000e2088    0000001c                            : fs_tofdfpu32.asm.obj (.text)
+                  000e20a4    0000001c                            : l_tofd28.asm.obj (.text)
+                  000e20c0    00000017                            : boot28.asm.obj (.text)
+                  000e20d7    0000000e                            : fd_sub28.asm.obj (.text)
+                  000e20e5    0000000d                            : copy_zero_init.c.obj (.text:decompress:ZI:__TI_zero_init_nomemset)
+                  000e20f2    0000000c                            : args_main.c.obj (.text)
+                  000e20fe    0000000b     rtFrwUtilities.obj (.text:__relaxed_cosf)
+                  000e2109    0000000b     rtFrwUtilities.obj (.text:__relaxed_sinf)
+                  000e2114    00000009     rtFrwUtilities.obj (.text:__relaxed_sqrtf)
+                  000e211d    00000009     rts2800_fpu32_eabi.lib : _lock.c.obj (.text)
+                  000e2126    00000008                            : copy_decompress_none.c.obj (.text:decompress:none)
+                  000e212e    00000008     f28p65x_codestartbranch.obj (.text)
+                  000e2136    00000002     rts2800_fpu32_eabi.lib : pre_init.c.obj (.text)
+                  000e2138    00000001                            : startup.c.obj (.text)
 
 MODULE SUMMARY
 
@@ -392,9 +395,10 @@ MODULE SUMMARY
        Total:                           31      0         0      
                                                                  
     .\SRC\
-       main.obj                         4629    0         376    
+       main.obj                         4933    4         376    
+       ultis.obj                        294     0         16     
     +--+--------------------------------+-------+---------+---------+
-       Total:                           4629    0         376    
+       Total:                           5227    4         392    
                                                                  
     C:\ti\ccs1250\ccs\tools\compiler\ti-cgt-c2000_22.6.1.LTS\lib\rts2800_fpu32_eabi.lib
        e_exp.c.obj                      635     120       0      
@@ -425,19 +429,19 @@ MODULE SUMMARY
        Stack:                           0       0         1024   
        Linker Generated:                0       77        0      
     +--+--------------------------------+-------+---------+---------+
-       Grand Total:                     10529   713       2974   
+       Grand Total:                     11127   717       2990   
 
 
 LINKER GENERATED COPY TABLES
 
-__TI_cinit_table @ 000e263e records: 2, size/record: 4, table size: 8
-	.data: load addr=000e25f8, load size=0000003b bytes, run addr=00010100, run size=000000a3 bytes, compression=lzss
-	.bss: load addr=000e263a, load size=00000004 bytes, run addr=00010000, run size=000000d8 bytes, compression=zero_init
+__TI_cinit_table @ 000e27fe records: 2, size/record: 4, table size: 8
+	.data: load addr=000e27b8, load size=0000003b bytes, run addr=00010100, run size=000000a3 bytes, compression=lzss
+	.bss: load addr=000e27fa, load size=00000004 bytes, run addr=00010000, run size=000000e8 bytes, compression=zero_init
 
 
 LINKER GENERATED HANDLER TABLE
 
-__TI_handler_table @ 000e2634 records: 3, size/record: 2, table size: 6
+__TI_handler_table @ 000e27f4 records: 3, size/record: 2, table size: 6
 	index: 0, handler: __TI_zero_init
 	index: 1, handler: __TI_decompress_lzss
 	index: 2, handler: __TI_decompress_none
@@ -480,59 +484,61 @@ address     data page           name
 000100a4     402 (00010080)     Task1msTime
 000100b0     402 (00010080)     GetDatBuff
 
-00010100     404 (00010100)     acceleration_
-00010101     404 (00010100)     last_traj_position_flag
-00010102     404 (00010100)     traj_start_
-00010103     404 (00010100)     Task1msTick
-00010104     404 (00010100)     Task10msTick
-00010105     404 (00010100)     LastTask1msTick
-00010106     404 (00010100)     TorqueSensorSumTick
-00010107     404 (00010100)     is_first_torqute_init_
-00010108     404 (00010100)     is_sin_wave
-0001010a     404 (00010100)     torque_source
-0001010d     404 (00010100)     stu_time
-0001010e     404 (00010100)     speed_stop_flag_
+000100d8     403 (000100c0)     chirp_signal_
+
+00010100     404 (00010100)     last_traj_position_flag
+00010101     404 (00010100)     traj_start_
+00010102     404 (00010100)     Task1msTick
+00010103     404 (00010100)     Task10msTick
+00010104     404 (00010100)     LastTask1msTick
+00010105     404 (00010100)     TorqueSensorSumTick
+00010106     404 (00010100)     is_first_torqute_init_
+00010107     404 (00010100)     is_sin_wave
+00010109     404 (00010100)     torque_source
+0001010c     404 (00010100)     stu_time
+0001010d     404 (00010100)     speed_stop_flag_
 00010110     404 (00010100)     t_
 00010112     404 (00010100)     omega_
-00010114     404 (00010100)     velocity_
-00010116     404 (00010100)     position_
-00010118     404 (00010100)     A_
-0001011a     404 (00010100)     phi_
-0001011c     404 (00010100)     LastCanFdInitSetFlag
-0001011e     404 (00010100)     LastCanFdStartSetFlag
-00010120     404 (00010100)     TorqueSensorDiffAdSample
-00010122     404 (00010100)     TorqueSensorSigleAdSample
-00010124     404 (00010100)     TorqueSensorDiffAd
-00010126     404 (00010100)     TorqueSensorSigleAd
-00010128     404 (00010100)     TorqueSensorDiffAdSum
-0001012a     404 (00010100)     diff_torque_offset
-0001012c     404 (00010100)     single_torque_offset
-0001012e     404 (00010100)     TorqueSensorSigleAdSum
-00010130     404 (00010100)     TorqueSensorSigleAd_pu
-00010132     404 (00010100)     TorqueSensorDiffAd_pu
-00010134     404 (00010100)     TorqueSensorDiffAd_pu_filter
-00010138     404 (00010100)     x11_pre
-0001013a     404 (00010100)     x22_pre
-0001013c     404 (00010100)     h
-0001013e     404 (00010100)     r
+00010114     404 (00010100)     acceleration_
+00010116     404 (00010100)     velocity_
+00010118     404 (00010100)     position_
+0001011a     404 (00010100)     A_
+0001011c     404 (00010100)     phi_
+0001011e     404 (00010100)     LastCanFdInitSetFlag
+00010120     404 (00010100)     LastCanFdStartSetFlag
+00010122     404 (00010100)     TorqueSensorDiffAdSample
+00010124     404 (00010100)     TorqueSensorSigleAdSample
+00010126     404 (00010100)     TorqueSensorDiffAd
+00010128     404 (00010100)     TorqueSensorSigleAd
+0001012a     404 (00010100)     TorqueSensorDiffAdSum
+0001012c     404 (00010100)     diff_torque_offset
+0001012e     404 (00010100)     single_torque_offset
+00010130     404 (00010100)     TorqueSensorSigleAdSum
+00010132     404 (00010100)     TorqueSensorSigleAd_pu
+00010134     404 (00010100)     TorqueSensorDiffAd_pu
+00010136     404 (00010100)     TorqueSensorDiffAd_pu_filter
+0001013a     404 (00010100)     x11_pre
+0001013c     404 (00010100)     x22_pre
+0001013e     404 (00010100)     h
 
-0001014c     405 (00010140)     dw_est
-0001014e     405 (00010140)     dTl
-00010150     405 (00010140)     Te
-00010152     405 (00010140)     Tl
-00010154     405 (00010140)     B
-00010156     405 (00010140)     g1
-00010158     405 (00010140)     g2
-0001015a     405 (00010140)     w
-0001015c     405 (00010140)     w_est
-00010162     405 (00010140)     actual_positon
-00010164     405 (00010140)     postion_offset
-00010166     405 (00010140)     gravity
-00010168     405 (00010140)     user_torque_setpoint
-0001016a     405 (00010140)     friction_force
-0001016c     405 (00010140)     TorqueSensorDiffAd_estimate
-0001016e     405 (00010140)     delta_TorqueSensorDiffAd
-00010170     405 (00010140)     TorqueSensorDiffAd_derived
+00010140     405 (00010140)     r
+0001014e     405 (00010140)     dw_est
+00010150     405 (00010140)     dTl
+00010152     405 (00010140)     Te
+00010154     405 (00010140)     Tl
+00010156     405 (00010140)     B
+00010158     405 (00010140)     g1
+0001015a     405 (00010140)     g2
+0001015c     405 (00010140)     w
+0001015e     405 (00010140)     w_est
+00010164     405 (00010140)     actual_positon
+00010166     405 (00010140)     postion_offset
+00010168     405 (00010140)     gravity
+0001016a     405 (00010140)     user_torque_setpoint
+0001016c     405 (00010140)     friction_force
+0001016e     405 (00010140)     TorqueSensorDiffAd_estimate
+00010170     405 (00010140)     delta_TorqueSensorDiffAd
+00010172     405 (00010140)     TorqueSensorDiffAd_derived
 
 00010180     406 (00010180)     ramp_generator_
 0001018c     406 (00010180)     force_ramp_generator_
@@ -578,26 +584,26 @@ page  address   name
 0     000e065e  ADCB3_ISR                        
 0     000e0668  ADCB4_ISR                        
 0     000e064a  ADCB_EVT_ISR                     
-0     000e116b  ADCB_init                        
+0     000e116d  ADCB_init                        
 0     000e037a  ADCC1_ISR                        
 0     000e09b0  ADCC2_ISR                        
 0     000e09ba  ADCC3_ISR                        
 0     000e09c4  ADCC4_ISR                        
 0     000e09ce  ADCCHECKINT_ISR                  
 0     000e09a6  ADCC_EVT_ISR                     
-0     000e17c5  ADC_configureRepeater            
-0     000e1712  ADC_setINLTrim                   
-0     000e16fe  ADC_setMode                      
-0     000e176d  ADC_setOffsetTrim                
-0     000e178f  ADC_setPPBTripLimits             
-0     000e1775  ADC_setVREF                      
-0     000e1686  ADC_setupSOCRefloChannel         
+0     000e17c7  ADC_configureRepeater            
+0     000e1714  ADC_setINLTrim                   
+0     000e1700  ADC_setMode                      
+0     000e176f  ADC_setOffsetTrim                
+0     000e1791  ADC_setPPBTripLimits             
+0     000e1777  ADC_setVREF                      
+0     000e1688  ADC_setupSOCRefloChannel         
 0     000e0992  AES_SINTREQUEST_ISR              
-0     00010118  A_                               
+0     0001011a  A_                               
 1     00000a80  AdcbResultRegs                   
-0     00010154  B                                
-0     000e112e  BaseBoardInit                    
-0     000e1e47  C$$EXIT                          
+0     00010156  B                                
+0     000e1130  BaseBoardInit                    
+0     000e1f6f  C$$EXIT                          
 0     000e05fa  CANA0_ISR                        
 0     000e0604  CANA1_ISR                        
 0     000e0730  CIPC0_ISR                        
@@ -624,7 +630,7 @@ page  address   name
 0     000e0956  CLB6_ISR                         
 0     000e0a3c  CPUCRC_ISR                       
 1     0005d200  ClkCfgRegs                       
-0     000e1d1b  ConfigCpuTimer                   
+0     000e1e43  ConfigCpuTimer                   
 1     0005d300  CpuSysRegs                       
 0     00010060  CpuTimer0                        
 1     00000c00  CpuTimer0Regs                    
@@ -632,8 +638,8 @@ page  address   name
 1     00000c08  CpuTimer1Regs                    
 0     00010070  CpuTimer2                        
 1     00000c10  CpuTimer2Regs                    
-0     000e1ee1  CycleLoadTimerCalcBegin          
-0     000e1d56  CycleLoadTimerCalcEnd            
+0     000e2009  CycleLoadTimerCalcBegin          
+0     000e1e7e  CycleLoadTimerCalcEnd            
 0     000e02bc  DATALOG_ISR                      
 0     000e0532  DMA_CH1_ISR                      
 0     000e053c  DMA_CH2_ISR                      
@@ -641,9 +647,9 @@ page  address   name
 0     000e0550  DMA_CH4_ISR                      
 0     000e055a  DMA_CH5_ISR                      
 0     000e0564  DMA_CH6_ISR                      
-0     000e0e55  DifferentiateDiscreteSignal      
-0     000e192f  DisableDog                       
-0     000e1901  DisablePeripheralClocks          
+0     000e0e53  DifferentiateDiscreteSignal      
+0     000e1931  DisableDog                       
+0     000e1903  DisablePeripheralClocks          
 0     000e044c  ECAP1_ISR                        
 0     000e0456  ECAP2_ISR                        
 0     000e0460  ECAP3_ISR                        
@@ -701,8 +707,8 @@ page  address   name
 0     000e04b0  EQEP4_ISR                        
 0     000e056e  EQEP5_ISR                        
 0     000e0578  EQEP6_ISR                        
-0     000e1e8f  EnableInterrupts                 
-0     000145d3  F28x_usDelay                     
+0     000e1fb7  EnableInterrupts                 
+0     0001466a  F28x_usDelay                     
 0     000e06ea  FLSS_ISR                         
 0     000e06f4  FPU_OVERFLOW_ISR                 
 0     000e06fe  FPU_UNDERFLOW_ISR                
@@ -720,47 +726,48 @@ page  address   name
 0     000e0816  FSITXB2_ISR                      
 1     0005f800  Flash0CtrlRegs                   
 1     0005fb00  Flash0EccRegs                    
-0     0001457f  Flash_initModule                 
+0     00014616  Flash_initModule                 
+0     000e1b62  GenerateChirp                    
 0     000100b0  GetDatBuff                       
 0     00010000  GetParm                          
-0     000e19ac  HALT                             
+0     000e19ae  HALT                             
 0     000e058c  I2CA_FIFO_ISR                    
 0     000e0708  I2CA_HIGH_ISR                    
 0     000e0582  I2CA_ISR                         
 0     000e05a0  I2CB_FIFO_ISR                    
 0     000e0596  I2CB_ISR                         
-0     000e19a3  IDLE                             
+0     000e19a5  IDLE                             
 0     000e02e4  ILLEGAL_ISR                      
 0     0003b000  IPC_CPU1_To_CPU2_GetBuffer       
 0     0003a000  IPC_CPU1_To_CPU2_PutBuffer       
 0     000e0260  IPC_Instance                     
-0     000e1561  IPC_initMessageQueue             
-0     000e14e7  IPC_readCommand                  
-0     000e15f4  IPC_readMessageFromQueue         
-0     000e1531  IPC_registerInterrupt            
-0     000e148a  IPC_sendCommand                  
-0     000e15ab  IPC_sendMessageToQueue           
-0     000e154a  IPC_unregisterInterrupt          
-0     000e1cda  InitCpuTimers                    
-0     000145b4  InitFlash                        
-0     000e1827  InitPeripheralClocks             
-0     000e1e70  InitPieCtrl                      
-0     000e1e98  InitPieVectTable                 
-0     000e1816  InitSysCtrl                      
-0     000e1df3  Interrupt_defaultHandler         
-0     000e1ae2  Interrupt_disable                
-0     000e1aab  Interrupt_enable                 
-0     000e1e09  Interrupt_illegalOperationHandler
-0     000e1a50  Interrupt_initModule             
-0     000e1a8d  Interrupt_initVectorTable        
-0     000e1e13  Interrupt_nmiHandler             
+0     000e1563  IPC_initMessageQueue             
+0     000e14e9  IPC_readCommand                  
+0     000e15f6  IPC_readMessageFromQueue         
+0     000e1533  IPC_registerInterrupt            
+0     000e148c  IPC_sendCommand                  
+0     000e15ad  IPC_sendMessageToQueue           
+0     000e154c  IPC_unregisterInterrupt          
+0     000e1e02  InitCpuTimers                    
+0     0001464b  InitFlash                        
+0     000e1829  InitPeripheralClocks             
+0     000e1f98  InitPieCtrl                      
+0     000e1fc0  InitPieVectTable                 
+0     000e1818  InitSysCtrl                      
+0     000e1f1b  Interrupt_defaultHandler         
+0     000e1ae4  Interrupt_disable                
+0     000e1aad  Interrupt_enable                 
+0     000e1f31  Interrupt_illegalOperationHandler
+0     000e1a52  Interrupt_initModule             
+0     000e1a8f  Interrupt_initVectorTable        
+0     000e1f3b  Interrupt_nmiHandler             
 0     000e050a  LINA_0_ISR                       
 0     000e0514  LINA_1_ISR                       
 0     000e051e  LINB_0_ISR                       
 0     000e0528  LINB_1_ISR                       
-0     0001011c  LastCanFdInitSetFlag             
-0     0001011e  LastCanFdStartSetFlag            
-0     00010105  LastTask1msTick                  
+0     0001011e  LastCanFdInitSetFlag             
+0     00010120  LastCanFdStartSetFlag            
+0     00010104  LastTask1msTick                  
 0     000e0960  MCANA_0_ISR                      
 0     000e096a  MCANA_1_ISR                      
 0     000e0974  MCANA_ECC_ISR                    
@@ -778,11 +785,11 @@ page  address   name
 1     00000d00  PieVectTable                     
 0     000e0040  PieVectTableInit                 
 0     000e02c6  RTOS_ISR                         
-0     000e25f3  RamfuncsLoadEnd                  
-abs   000005db  RamfuncsLoadSize                 
-0     000e2018  RamfuncsLoadStart                
-0     000145db  RamfuncsRunEnd                   
-abs   000005db  RamfuncsRunSize                  
+0     000e27b2  RamfuncsLoadEnd                  
+abs   00000672  RamfuncsLoadSize                 
+0     000e2140  RamfuncsLoadStart                
+0     00014672  RamfuncsRunEnd                   
+abs   00000672  RamfuncsRunSize                  
 0     00014000  RamfuncsRunStart                 
 0     000e05d2  SCIA_RX_ISR                      
 0     000e05dc  SCIA_TX_ISR                      
@@ -817,36 +824,36 @@ abs   000005db  RamfuncsRunSize
 0     000e08ac  SPID_RX_ISR                      
 0     000e08b6  SPID_TX_ISR                      
 0     000e0712  SYS_ERR_ISR                      
-0     000e10e6  ScheduleDriveInit                
-0     000e1921  ServiceDog                       
-0     000145d7  SysCtl_delay                     
-0     000e193d  SysIntOsc1Sel                    
-0     000e1947  SysIntOsc2Sel                    
-0     000e198d  SysXtalOscSESel                  
-0     000e196a  SysXtalOscSel                    
+0     000e10e8  ScheduleDriveInit                
+0     000e1923  ServiceDog                       
+0     0001466e  SysCtl_delay                     
+0     000e193f  SysIntOsc1Sel                    
+0     000e1949  SysIntOsc2Sel                    
+0     000e198f  SysXtalOscSESel                  
+0     000e196c  SysXtalOscSel                    
 0     000e0398  TIMER0_ISR                       
 0     000e02a8  TIMER1_ISR                       
 0     000e02b2  TIMER2_ISR                       
 0     00014000  TINT0_isr                        
-0     00010104  Task10msTick                     
-0     00010103  Task1msTick                      
+0     00010103  Task10msTick                     
+0     00010102  Task1msTick                      
 0     000100a4  Task1msTime                      
 0     00010098  Task50usTime                     
-0     00010150  Te                               
-0     000e0d37  TestFr_Disturbance               
-0     00010152  Tl                               
-0     00010124  TorqueSensorDiffAd               
-0     00010120  TorqueSensorDiffAdSample         
-0     00010128  TorqueSensorDiffAdSum            
-0     00010170  TorqueSensorDiffAd_derived       
-0     0001016c  TorqueSensorDiffAd_estimate      
-0     00010132  TorqueSensorDiffAd_pu            
-0     00010134  TorqueSensorDiffAd_pu_filter     
-0     00010126  TorqueSensorSigleAd              
-0     00010122  TorqueSensorSigleAdSample        
-0     0001012e  TorqueSensorSigleAdSum           
-0     00010130  TorqueSensorSigleAd_pu           
-0     00010106  TorqueSensorSumTick              
+0     00010152  Te                               
+0     000e0d35  TestFr_Disturbance               
+0     00010154  Tl                               
+0     00010126  TorqueSensorDiffAd               
+0     00010122  TorqueSensorDiffAdSample         
+0     0001012a  TorqueSensorDiffAdSum            
+0     00010172  TorqueSensorDiffAd_derived       
+0     0001016e  TorqueSensorDiffAd_estimate      
+0     00010134  TorqueSensorDiffAd_pu            
+0     00010136  TorqueSensorDiffAd_pu_filter     
+0     00010128  TorqueSensorSigleAd              
+0     00010124  TorqueSensorSigleAdSample        
+0     00010130  TorqueSensorSigleAdSum           
+0     00010132  TorqueSensorSigleAd_pu           
+0     00010105  TorqueSensorSumTick              
 0     000e05aa  UARTA_ISR                        
 0     000e05b4  UARTB_ISR                        
 0     000e099c  USBA_ISR                         
@@ -869,110 +876,112 @@ abs   000005db  RamfuncsRunSize
 0     000e06c2  XINT3_ISR                        
 0     000e06cc  XINT4_ISR                        
 0     000e06d6  XINT5_ISR                        
-0     000e263e  __TI_CINIT_Base                  
-0     000e2646  __TI_CINIT_Limit                 
-0     000e2646  __TI_CINIT_Warm                  
-0     000e2634  __TI_Handler_Table_Base          
-0     000e263a  __TI_Handler_Table_Limit         
+0     000e27fe  __TI_CINIT_Base                  
+0     000e2806  __TI_CINIT_Limit                 
+0     000e2806  __TI_CINIT_Warm                  
+0     000e27f4  __TI_Handler_Table_Base          
+0     000e27fa  __TI_Handler_Table_Limit         
 0     00000800  __TI_STACK_END                   
 abs   00000400  __TI_STACK_SIZE                  
-0     000e1dc8  __TI_auto_init_nobinit_nopinit   
+0     000e1ef0  __TI_auto_init_nobinit_nopinit   
 0     0001019a  __TI_cleanup_ptr                 
-0     000e1d98  __TI_decompress_lzss             
-0     000e1ffe  __TI_decompress_none             
+0     000e1ec0  __TI_decompress_lzss             
+0     000e2126  __TI_decompress_none             
 0     0001019c  __TI_dtors_ptr                   
 0     00010198  __TI_enable_exit_profile_output  
 abs   ffffffff  __TI_pprof_out_hndl              
 abs   ffffffff  __TI_prof_data_size              
 abs   ffffffff  __TI_prof_data_start             
-0     000e1fbd  __TI_zero_init_nomemset          
-0     000e1b30  __c28xabi_addd                   
-0     000e1e1d  __c28xabi_cmpd                   
-0     000e1bcc  __c28xabi_divd                   
-0     000e1ebe  __c28xabi_dtof                   
-0     000e1f03  __c28xabi_dtoi                   
-0     000e1f60  __c28xabi_ftod                   
-0     000e1f7c  __c28xabi_ltod                   
-0     000e1c57  __c28xabi_mpyd                   
-0     000e1faf  __c28xabi_subd                   
+0     000e20e5  __TI_zero_init_nomemset          
+0     000e1c58  __c28xabi_addd                   
+0     000e1f45  __c28xabi_cmpd                   
+0     000e1cf4  __c28xabi_divd                   
+0     000e1fe6  __c28xabi_dtof                   
+0     000e202b  __c28xabi_dtoi                   
+0     000e2088  __c28xabi_ftod                   
+0     000e20a4  __c28xabi_ltod                   
+0     000e1d7f  __c28xabi_mpyd                   
+0     000e20d7  __c28xabi_subd                   
 n/a   UNDEFED   __c_args__                       
-0     000e1fd6  __relaxed_cosf                   
-0     000e1fe1  __relaxed_sinf                   
-0     000e1fec  __relaxed_sqrtf                  
+0     000e20fe  __relaxed_cosf                   
+0     000e2109  __relaxed_sinf                   
+0     000e2114  __relaxed_sqrtf                  
 0     00000400  __stack                          
-0     000e1fca  _args_main                       
-0     000e1f98  _c_int00                         
+0     000e20f2  _args_main                       
+0     000e20c0  _c_int00                         
 0     0001019e  _lock                            
-0     000e1ffd  _nop                             
-0     000e1ff9  _register_lock                   
-0     000e1ff5  _register_unlock                 
-0     000e2010  _system_post_cinit               
-0     000e200e  _system_pre_init                 
+0     000e2125  _nop                             
+0     000e2121  _register_lock                   
+0     000e211d  _register_unlock                 
+0     000e2138  _system_post_cinit               
+0     000e2136  _system_pre_init                 
 0     000101a0  _unlock                          
-0     000e1e47  abort                            
-0     00010100  acceleration_                    
-0     00010162  actual_positon                   
-0     000e0f75  adrc_control                     
-0     000e0cd3  applyFilter                      
-0     000e0c83  calculate_friction_force         
+0     000e1f6f  abort                            
+0     00010114  acceleration_                    
+0     00010164  actual_positon                   
+0     000e0f77  adrc_control                     
+0     000e0cd1  applyFilter                      
+0     000e0c81  calculate_friction_force         
+0     000e1b32  chirp_reset                      
+0     000100d8  chirp_signal_                    
 0     000e0000  code_start                       
-0     0001014e  dTl                              
-0     0001016e  delta_TorqueSensorDiffAd         
-0     0001012a  diff_torque_offset               
-0     0001014c  dw_est                           
+0     00010150  dTl                              
+0     00010170  delta_TorqueSensorDiffAd         
+0     0001012c  diff_torque_offset               
+0     0001014e  dw_est                           
 0     000101a2  errno                            
-0     000e0edd  eso_update                       
-0     000e1e49  exit                             
-0     000e11e2  exp                              
-0     000e11e2  expl                             
+0     000e0edf  eso_update                       
+0     000e1f71  exit                             
+0     000e11e4  exp                              
+0     000e11e4  expl                             
 0     00010080  fh                               
-0     000e0da4  fhan                             
+0     000e0da2  fhan                             
 0     0001008c  filter                           
 0     00010090  filter_force                     
 0     00010094  filter_force_derived             
 0     0001018c  force_ramp_generator_            
-0     0001016a  friction_force                   
-0     00010156  g1                               
-0     00010158  g2                               
-0     000e0fa8  get_test_fre                     
-0     00010166  gravity                          
-0     0001013c  h                                
-0     000e0ca0  initFilter                       
+0     0001016c  friction_force                   
+0     00010158  g1                               
+0     0001015a  g2                               
+0     000e0faa  get_test_fre                     
+0     00010168  gravity                          
+0     0001013e  h                                
+0     000e0c9e  initFilter                       
 0     0003a088  ipcCPU1ToCPU2Data                
 0     0003b088  ipcCPU2ToCPU1Data                
-0     00010107  is_first_torqute_init_           
-0     00010108  is_sin_wave                      
-0     00010101  last_traj_position_flag          
-0     000e0fad  luenberger_load_observer         
-0     000e0cf1  main                             
-0     000e1f43  memcpy                           
+0     00010106  is_first_torqute_init_           
+0     00010107  is_sin_wave                      
+0     00010100  last_traj_position_flag          
+0     000e0faf  luenberger_load_observer         
+0     000e0cef  main                             
+0     000e206b  memcpy                           
 0     00010112  omega_                           
-0     000e0f51  pd_control                       
-0     0001011a  phi_                             
-0     000e0e9f  plant_model                      
-0     00010116  position_                        
-0     00010164  postion_offset                   
-0     0001013e  r                                
+0     000e0f53  pd_control                       
+0     0001011c  phi_                             
+0     000e0ea1  plant_model                      
+0     00010118  position_                        
+0     00010166  postion_offset                   
+0     00010140  r                                
 0     00010180  ramp_generator_                  
-0     000e1017  ramp_update                      
-0     000e0d93  sign                             
-0     0001012c  single_torque_offset             
-0     0001010e  speed_stop_flag_                 
-0     000e10a6  step_update                      
-0     0001010d  stu_time                         
+0     000e1019  ramp_update                      
+0     000e0d91  sign                             
+0     0001012e  single_torque_offset             
+0     0001010d  speed_stop_flag_                 
+0     000e10a8  step_update                      
+0     0001010c  stu_time                         
 0     00010110  t_                               
-0     000e1012  timer_callbakc                   
-0     0001010a  torque_source                    
+0     000e1014  timer_callbakc                   
+0     00010109  torque_source                    
 0     000e0c01  traj                             
-0     00010102  traj_start_                      
-0     00010168  user_torque_setpoint             
-0     00010114  velocity_                        
-0     0001015a  w                                
-0     0001015c  w_est                            
+0     00010101  traj_start_                      
+0     0001016a  user_torque_setpoint             
+0     00010116  velocity_                        
+0     0001015c  w                                
+0     0001015e  w_est                            
 0     00010082  x11                              
-0     00010138  x11_pre                          
+0     0001013a  x11_pre                          
 0     00010084  x22                              
-0     0001013a  x22_pre                          
+0     0001013c  x22_pre                          
 0     00010086  xx11                             
 0     00010088  xx22                             
 0     0001008a  xxx2                             
@@ -1000,58 +1009,59 @@ page  address   name
 0     00010098  Task50usTime                     
 0     000100a4  Task1msTime                      
 0     000100b0  GetDatBuff                       
-0     00010100  acceleration_                    
-0     00010101  last_traj_position_flag          
-0     00010102  traj_start_                      
-0     00010103  Task1msTick                      
-0     00010104  Task10msTick                     
-0     00010105  LastTask1msTick                  
-0     00010106  TorqueSensorSumTick              
-0     00010107  is_first_torqute_init_           
-0     00010108  is_sin_wave                      
-0     0001010a  torque_source                    
-0     0001010d  stu_time                         
-0     0001010e  speed_stop_flag_                 
+0     000100d8  chirp_signal_                    
+0     00010100  last_traj_position_flag          
+0     00010101  traj_start_                      
+0     00010102  Task1msTick                      
+0     00010103  Task10msTick                     
+0     00010104  LastTask1msTick                  
+0     00010105  TorqueSensorSumTick              
+0     00010106  is_first_torqute_init_           
+0     00010107  is_sin_wave                      
+0     00010109  torque_source                    
+0     0001010c  stu_time                         
+0     0001010d  speed_stop_flag_                 
 0     00010110  t_                               
 0     00010112  omega_                           
-0     00010114  velocity_                        
-0     00010116  position_                        
-0     00010118  A_                               
-0     0001011a  phi_                             
-0     0001011c  LastCanFdInitSetFlag             
-0     0001011e  LastCanFdStartSetFlag            
-0     00010120  TorqueSensorDiffAdSample         
-0     00010122  TorqueSensorSigleAdSample        
-0     00010124  TorqueSensorDiffAd               
-0     00010126  TorqueSensorSigleAd              
-0     00010128  TorqueSensorDiffAdSum            
-0     0001012a  diff_torque_offset               
-0     0001012c  single_torque_offset             
-0     0001012e  TorqueSensorSigleAdSum           
-0     00010130  TorqueSensorSigleAd_pu           
-0     00010132  TorqueSensorDiffAd_pu            
-0     00010134  TorqueSensorDiffAd_pu_filter     
-0     00010138  x11_pre                          
-0     0001013a  x22_pre                          
-0     0001013c  h                                
-0     0001013e  r                                
-0     0001014c  dw_est                           
-0     0001014e  dTl                              
-0     00010150  Te                               
-0     00010152  Tl                               
-0     00010154  B                                
-0     00010156  g1                               
-0     00010158  g2                               
-0     0001015a  w                                
-0     0001015c  w_est                            
-0     00010162  actual_positon                   
-0     00010164  postion_offset                   
-0     00010166  gravity                          
-0     00010168  user_torque_setpoint             
-0     0001016a  friction_force                   
-0     0001016c  TorqueSensorDiffAd_estimate      
-0     0001016e  delta_TorqueSensorDiffAd         
-0     00010170  TorqueSensorDiffAd_derived       
+0     00010114  acceleration_                    
+0     00010116  velocity_                        
+0     00010118  position_                        
+0     0001011a  A_                               
+0     0001011c  phi_                             
+0     0001011e  LastCanFdInitSetFlag             
+0     00010120  LastCanFdStartSetFlag            
+0     00010122  TorqueSensorDiffAdSample         
+0     00010124  TorqueSensorSigleAdSample        
+0     00010126  TorqueSensorDiffAd               
+0     00010128  TorqueSensorSigleAd              
+0     0001012a  TorqueSensorDiffAdSum            
+0     0001012c  diff_torque_offset               
+0     0001012e  single_torque_offset             
+0     00010130  TorqueSensorSigleAdSum           
+0     00010132  TorqueSensorSigleAd_pu           
+0     00010134  TorqueSensorDiffAd_pu            
+0     00010136  TorqueSensorDiffAd_pu_filter     
+0     0001013a  x11_pre                          
+0     0001013c  x22_pre                          
+0     0001013e  h                                
+0     00010140  r                                
+0     0001014e  dw_est                           
+0     00010150  dTl                              
+0     00010152  Te                               
+0     00010154  Tl                               
+0     00010156  B                                
+0     00010158  g1                               
+0     0001015a  g2                               
+0     0001015c  w                                
+0     0001015e  w_est                            
+0     00010164  actual_positon                   
+0     00010166  postion_offset                   
+0     00010168  gravity                          
+0     0001016a  user_torque_setpoint             
+0     0001016c  friction_force                   
+0     0001016e  TorqueSensorDiffAd_estimate      
+0     00010170  delta_TorqueSensorDiffAd         
+0     00010172  TorqueSensorDiffAd_derived       
 0     00010180  ramp_generator_                  
 0     0001018c  force_ramp_generator_            
 0     00010198  __TI_enable_exit_profile_output  
@@ -1063,11 +1073,11 @@ page  address   name
 0     00014000  RamfuncsRunStart                 
 0     00014000  TINT0_isr                        
 0     0001404f  CIPC1_INT_isr                    
-0     0001457f  Flash_initModule                 
-0     000145b4  InitFlash                        
-0     000145d3  F28x_usDelay                     
-0     000145d7  SysCtl_delay                     
-0     000145db  RamfuncsRunEnd                   
+0     00014616  Flash_initModule                 
+0     0001464b  InitFlash                        
+0     0001466a  F28x_usDelay                     
+0     0001466e  SysCtl_delay                     
+0     00014672  RamfuncsRunEnd                   
 0     0003a000  IPC_CPU1_To_CPU2_PutBuffer       
 0     0003a088  ipcCPU1ToCPU2Data                
 0     0003b000  IPC_CPU1_To_CPU2_GetBuffer       
@@ -1277,101 +1287,103 @@ page  address   name
 0     000e0a6e  EMPTY_ISR                        
 0     000e0a7b  NOTUSED_ISR                      
 0     000e0c01  traj                             
-0     000e0c83  calculate_friction_force         
-0     000e0ca0  initFilter                       
-0     000e0cd3  applyFilter                      
-0     000e0cf1  main                             
-0     000e0d37  TestFr_Disturbance               
-0     000e0d93  sign                             
-0     000e0da4  fhan                             
-0     000e0e55  DifferentiateDiscreteSignal      
-0     000e0e9f  plant_model                      
-0     000e0edd  eso_update                       
-0     000e0f51  pd_control                       
-0     000e0f75  adrc_control                     
-0     000e0fa8  get_test_fre                     
-0     000e0fad  luenberger_load_observer         
-0     000e1012  timer_callbakc                   
-0     000e1017  ramp_update                      
-0     000e10a6  step_update                      
-0     000e10e6  ScheduleDriveInit                
-0     000e112e  BaseBoardInit                    
-0     000e116b  ADCB_init                        
-0     000e11e2  exp                              
-0     000e11e2  expl                             
-0     000e148a  IPC_sendCommand                  
-0     000e14e7  IPC_readCommand                  
-0     000e1531  IPC_registerInterrupt            
-0     000e154a  IPC_unregisterInterrupt          
-0     000e1561  IPC_initMessageQueue             
-0     000e15ab  IPC_sendMessageToQueue           
-0     000e15f4  IPC_readMessageFromQueue         
-0     000e1686  ADC_setupSOCRefloChannel         
-0     000e16fe  ADC_setMode                      
-0     000e1712  ADC_setINLTrim                   
-0     000e176d  ADC_setOffsetTrim                
-0     000e1775  ADC_setVREF                      
-0     000e178f  ADC_setPPBTripLimits             
-0     000e17c5  ADC_configureRepeater            
-0     000e1816  InitSysCtrl                      
-0     000e1827  InitPeripheralClocks             
-0     000e1901  DisablePeripheralClocks          
-0     000e1921  ServiceDog                       
-0     000e192f  DisableDog                       
-0     000e193d  SysIntOsc1Sel                    
-0     000e1947  SysIntOsc2Sel                    
-0     000e196a  SysXtalOscSel                    
-0     000e198d  SysXtalOscSESel                  
-0     000e19a3  IDLE                             
-0     000e19ac  HALT                             
-0     000e1a50  Interrupt_initModule             
-0     000e1a8d  Interrupt_initVectorTable        
-0     000e1aab  Interrupt_enable                 
-0     000e1ae2  Interrupt_disable                
-0     000e1b30  __c28xabi_addd                   
-0     000e1bcc  __c28xabi_divd                   
-0     000e1c57  __c28xabi_mpyd                   
-0     000e1cda  InitCpuTimers                    
-0     000e1d1b  ConfigCpuTimer                   
-0     000e1d56  CycleLoadTimerCalcEnd            
-0     000e1d98  __TI_decompress_lzss             
-0     000e1dc8  __TI_auto_init_nobinit_nopinit   
-0     000e1df3  Interrupt_defaultHandler         
-0     000e1e09  Interrupt_illegalOperationHandler
-0     000e1e13  Interrupt_nmiHandler             
-0     000e1e1d  __c28xabi_cmpd                   
-0     000e1e47  C$$EXIT                          
-0     000e1e47  abort                            
-0     000e1e49  exit                             
-0     000e1e70  InitPieCtrl                      
-0     000e1e8f  EnableInterrupts                 
-0     000e1e98  InitPieVectTable                 
-0     000e1ebe  __c28xabi_dtof                   
-0     000e1ee1  CycleLoadTimerCalcBegin          
-0     000e1f03  __c28xabi_dtoi                   
-0     000e1f43  memcpy                           
-0     000e1f60  __c28xabi_ftod                   
-0     000e1f7c  __c28xabi_ltod                   
-0     000e1f98  _c_int00                         
-0     000e1faf  __c28xabi_subd                   
-0     000e1fbd  __TI_zero_init_nomemset          
-0     000e1fca  _args_main                       
-0     000e1fd6  __relaxed_cosf                   
-0     000e1fe1  __relaxed_sinf                   
-0     000e1fec  __relaxed_sqrtf                  
-0     000e1ff5  _register_unlock                 
-0     000e1ff9  _register_lock                   
-0     000e1ffd  _nop                             
-0     000e1ffe  __TI_decompress_none             
-0     000e200e  _system_pre_init                 
-0     000e2010  _system_post_cinit               
-0     000e2018  RamfuncsLoadStart                
-0     000e25f3  RamfuncsLoadEnd                  
-0     000e2634  __TI_Handler_Table_Base          
-0     000e263a  __TI_Handler_Table_Limit         
-0     000e263e  __TI_CINIT_Base                  
-0     000e2646  __TI_CINIT_Limit                 
-0     000e2646  __TI_CINIT_Warm                  
+0     000e0c81  calculate_friction_force         
+0     000e0c9e  initFilter                       
+0     000e0cd1  applyFilter                      
+0     000e0cef  main                             
+0     000e0d35  TestFr_Disturbance               
+0     000e0d91  sign                             
+0     000e0da2  fhan                             
+0     000e0e53  DifferentiateDiscreteSignal      
+0     000e0ea1  plant_model                      
+0     000e0edf  eso_update                       
+0     000e0f53  pd_control                       
+0     000e0f77  adrc_control                     
+0     000e0faa  get_test_fre                     
+0     000e0faf  luenberger_load_observer         
+0     000e1014  timer_callbakc                   
+0     000e1019  ramp_update                      
+0     000e10a8  step_update                      
+0     000e10e8  ScheduleDriveInit                
+0     000e1130  BaseBoardInit                    
+0     000e116d  ADCB_init                        
+0     000e11e4  exp                              
+0     000e11e4  expl                             
+0     000e148c  IPC_sendCommand                  
+0     000e14e9  IPC_readCommand                  
+0     000e1533  IPC_registerInterrupt            
+0     000e154c  IPC_unregisterInterrupt          
+0     000e1563  IPC_initMessageQueue             
+0     000e15ad  IPC_sendMessageToQueue           
+0     000e15f6  IPC_readMessageFromQueue         
+0     000e1688  ADC_setupSOCRefloChannel         
+0     000e1700  ADC_setMode                      
+0     000e1714  ADC_setINLTrim                   
+0     000e176f  ADC_setOffsetTrim                
+0     000e1777  ADC_setVREF                      
+0     000e1791  ADC_setPPBTripLimits             
+0     000e17c7  ADC_configureRepeater            
+0     000e1818  InitSysCtrl                      
+0     000e1829  InitPeripheralClocks             
+0     000e1903  DisablePeripheralClocks          
+0     000e1923  ServiceDog                       
+0     000e1931  DisableDog                       
+0     000e193f  SysIntOsc1Sel                    
+0     000e1949  SysIntOsc2Sel                    
+0     000e196c  SysXtalOscSel                    
+0     000e198f  SysXtalOscSESel                  
+0     000e19a5  IDLE                             
+0     000e19ae  HALT                             
+0     000e1a52  Interrupt_initModule             
+0     000e1a8f  Interrupt_initVectorTable        
+0     000e1aad  Interrupt_enable                 
+0     000e1ae4  Interrupt_disable                
+0     000e1b32  chirp_reset                      
+0     000e1b62  GenerateChirp                    
+0     000e1c58  __c28xabi_addd                   
+0     000e1cf4  __c28xabi_divd                   
+0     000e1d7f  __c28xabi_mpyd                   
+0     000e1e02  InitCpuTimers                    
+0     000e1e43  ConfigCpuTimer                   
+0     000e1e7e  CycleLoadTimerCalcEnd            
+0     000e1ec0  __TI_decompress_lzss             
+0     000e1ef0  __TI_auto_init_nobinit_nopinit   
+0     000e1f1b  Interrupt_defaultHandler         
+0     000e1f31  Interrupt_illegalOperationHandler
+0     000e1f3b  Interrupt_nmiHandler             
+0     000e1f45  __c28xabi_cmpd                   
+0     000e1f6f  C$$EXIT                          
+0     000e1f6f  abort                            
+0     000e1f71  exit                             
+0     000e1f98  InitPieCtrl                      
+0     000e1fb7  EnableInterrupts                 
+0     000e1fc0  InitPieVectTable                 
+0     000e1fe6  __c28xabi_dtof                   
+0     000e2009  CycleLoadTimerCalcBegin          
+0     000e202b  __c28xabi_dtoi                   
+0     000e206b  memcpy                           
+0     000e2088  __c28xabi_ftod                   
+0     000e20a4  __c28xabi_ltod                   
+0     000e20c0  _c_int00                         
+0     000e20d7  __c28xabi_subd                   
+0     000e20e5  __TI_zero_init_nomemset          
+0     000e20f2  _args_main                       
+0     000e20fe  __relaxed_cosf                   
+0     000e2109  __relaxed_sinf                   
+0     000e2114  __relaxed_sqrtf                  
+0     000e211d  _register_unlock                 
+0     000e2121  _register_lock                   
+0     000e2125  _nop                             
+0     000e2126  __TI_decompress_none             
+0     000e2136  _system_pre_init                 
+0     000e2138  _system_post_cinit               
+0     000e2140  RamfuncsLoadStart                
+0     000e27b2  RamfuncsLoadEnd                  
+0     000e27f4  __TI_Handler_Table_Base          
+0     000e27fa  __TI_Handler_Table_Limit         
+0     000e27fe  __TI_CINIT_Base                  
+0     000e2806  __TI_CINIT_Limit                 
+0     000e2806  __TI_CINIT_Warm                  
 1     00000a80  AdcbResultRegs                   
 1     00000c00  CpuTimer0Regs                    
 1     00000c08  CpuTimer1Regs                    
@@ -1384,11 +1396,11 @@ page  address   name
 1     0005f800  Flash0CtrlRegs                   
 1     0005fb00  Flash0EccRegs                    
 abs   00000400  __TI_STACK_SIZE                  
-abs   000005db  RamfuncsLoadSize                 
-abs   000005db  RamfuncsRunSize                  
+abs   00000672  RamfuncsLoadSize                 
+abs   00000672  RamfuncsRunSize                  
 abs   ffffffff  __TI_pprof_out_hndl              
 abs   ffffffff  __TI_prof_data_size              
 abs   ffffffff  __TI_prof_data_start             
 n/a   UNDEFED   __c_args__                       
 
-[408 symbols]
+[411 symbols]

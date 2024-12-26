@@ -1,0 +1,8 @@
+#ifndef __BOARD_H
+#define __BOARD_H
+
+#define MAX_CURRENT_RAMP 200.f
+
+
+#endif
+

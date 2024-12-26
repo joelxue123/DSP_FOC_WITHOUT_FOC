@@ -6,12 +6,14 @@
 #include "f28p65x_examples.h"
 #include "string.h"
 #include <math.h>
+#include <ultis.h>
+#include <board.h>
+
 
 #define PIEMASK0                       64
 #define IFRMASK                        1
 
-#define M_PI (3.14159265358979323846f)
-#define LIMIT(value, max, min) ((value) > (max) ? (max) : ((value) < (min) ? (min) : (value)))
+
 
 float32 GetParm[48];
 enum MOTOR_PARM_E
@@ -39,13 +41,13 @@ enum MOTOR_PARM_E
  锟斤拷锟斤拷锟斤拷锟斤拷转锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷去锟斤拷锟� 锟皆匡拷锟脚观诧拷锟斤拷锟剿★拷
  * *
  */
-float32 t_ =0;
+float32 t_ =0.f;
 float32  omega_ = 2*M_PI*10.0f;
-acceleration_ = 0;
-float32 velocity_ =0;
-float32 position_ = 0;
+float32 acceleration_ = 0.f;
+float32 velocity_ =0.f;
+float32 position_ = 0.f;
 float32 A_ = 0.02f;
-float32 phi_=0;
+float32 phi_=0.f;
 int last_traj_position_flag =0;
 int traj_start_ = 0;
 void traj(float32 omega )
@@ -132,13 +134,13 @@ int32  TorqueSensorSigleAdSample=0;
 int32  TorqueSensorDiffAd=0;
 int32  TorqueSensorSigleAd=0;
 int32  TorqueSensorDiffAdSum=0;
-float32 diff_torque_offset = 0;
+float32 diff_torque_offset = 0.f;
 int32 single_torque_offset = 0;
 int32  TorqueSensorSigleAdSum=0;
 Uint16 TorqueSensorSumTick=0;
 float32 TorqueSensorSigleAd_pu = 0.0f;
 float32 TorqueSensorDiffAd_pu = 0.0f;
-float32 TorqueSensorDiffAd_pu_filter = 0;
+float32 TorqueSensorDiffAd_pu_filter = 0.f;
 bool is_first_torqute_init_ = true;
 
 
@@ -285,11 +287,11 @@ interrupt void TINT0_isr(void)
 
 #define TORQ_LOOP_TIME_S (1.0f/10000)
 int is_sin_wave = 0;
-static float32 TestFrHz= 0;
+static float32 TestFrHz= 0.f;
 
 float32 TestFr_Disturbance(float32 curr_amp) {
     static float32 theata=0.0F;
-    float32 TestFrDisturbance =0 ;
+    float32 TestFrDisturbance =0.f ;
 
     theata = theata + (TORQ_LOOP_TIME_S * 6.2831853F) * TestFrHz;
     while(theata > 6.2831853F){
@@ -363,7 +365,13 @@ void DifferentiateDiscreteSignal(float32 TorqueSensorDiffAd_pu)
 #define ReductionRatio 100
 #define KT 0.024f
 #define J  2.68e-5f
-#define INERTIA 0.065510f
+
+//#define INERTIA 0.065510f
+//#define load_M   1.88087f
+
+#define INERTIA 0.0f
+#define load_M   0.0f
+
 #define MAX_CURRENT (22.f)
 // ADRC锟斤拷锟斤拷
 #define WC   150.0f
@@ -378,12 +386,12 @@ void DifferentiateDiscreteSignal(float32 TorqueSensorDiffAd_pu)
 
 
 /* ESO状态锟斤拷锟斤拷 */
-static float32 z1 = 0.0, z2 = 0.0, z3 = 0.0;
+static float32 z1 = 0.0f, z2 = 0.0f, z3 = 0.0f;
 /* 锟斤拷锟斤拷锟斤拷锟斤拷 */
-static float32 u = 0.0;
+static float32 u = 0.0f;
 
 /* 系统锟斤拷锟� */
-static float32 y = 0.0;
+static float32 y = 0.0f;
 
 // 锟斤拷锟截讹拷锟斤拷模锟斤拷
 void plant_model(float32 u, float32 *y, float32 *x1, float32 *x2)
@@ -493,6 +501,7 @@ enum {
     MOTOR_IMPEDANCE = 2,
     MOTOR_SPEED =3,
     MOTOR_GRAVITY_COMPENSATION = 4,
+    MOTOR_POS_CHIRP = 5,
 };
 
 typedef enum
@@ -518,13 +527,13 @@ static int  TorqueSensorDiffAd_stable_cnt = 0;
 float32  actual_positon = 0;
 float32 postion_offset = 4.0f;
 int stu_time = 0;
-float32 gravity = 0;
+float32 gravity = 0.f;
 float32 user_torque_setpoint = 0.f;
 int speed_stop_flag_ =0;
-float32 friction_force =0;
-float32 TorqueSensorDiffAd_estimate =0;
-float32 delta_TorqueSensorDiffAd = 0;
-float32 TorqueSensorDiffAd_derived = 0;
+float32 friction_force =0.f;
+float32 TorqueSensorDiffAd_estimate =0.f;
+float32 delta_TorqueSensorDiffAd = 0.f;
+float32 TorqueSensorDiffAd_derived = 0.f;
 typedef struct {
 
     float32 amplify;
@@ -625,7 +634,7 @@ interrupt void CIPC1_INT_isr(void)
   float32 derivative  = 0;
   float32 TorqueSensorDiffAd_origin = 0;
   float32 motor_control_mode = MOTOR_CURR;
-  float32 load_M =  1.88087f;
+  
   { //锟斤拷锟捷达拷锟斤拷锟斤拷锟斤拷锟�50us锟斤拷锟斤拷始锟斤拷锟斤拷
       //锟斤拷取CPU1锟斤拷锟斤拷
       GetDatBuff[0] = ipcCPU1ToCPU2Data.MotorAxisEncoder_rad;
@@ -799,8 +808,19 @@ interrupt void CIPC1_INT_isr(void)
                           //  user_torque_setpoint = GetParm[MOTOR_PARM_torque_SETPOINT]*TestFr_Disturbance(1.0f)/ADC_FULL_SCALE +  gravity/torque_base;
                             user_torque_setpoint = step_update(&force_ramp_generator_);
                         }
+                        else if(MOTOR_POS_CHIRP == motor_control_mode)
+                        {
+
+                            if(false == GenerateChirp(&chirp_signal_, chirp_signal_.startFreq , chirp_signal_.endFreq , chirp_signal_.sweepTime, chirp_signal_.currentTime))
+                            {
+                                chirp_signal_.currentTime += Ts;
+                                user_torque_setpoint = positon_kp*(chirp_signal_.position -actual_positon) + speed_kd*( chirp_signal_.velocity*50.f - w) + gravity/torque_base + chirp_signal_.acceleration*INERTIA/torque_base;
+                            }
+                             
+                        }
                         else if(motor_control_mode==MOTOR_IDLE)
                         {
+                            chirp_reset(&chirp_signal_);
                             speed_stop_flag_ =0;
                             traj_start_ =0;
                             last_traj_position_flag =GetParm[5] ;
@@ -811,14 +831,18 @@ interrupt void CIPC1_INT_isr(void)
                        erro = user_torque_setpoint - TorqueSensorDiffAd_pu;
                       // DifferentiateDiscreteSignal(erro);
                       // derivative  = xxx2;
-                       TorqueSensorDiffAd_estimate += 0.0001f * TorqueSensorDiffAd_derived;
-                       delta_TorqueSensorDiffAd =  erro - TorqueSensorDiffAd_estimate;
+                      TorqueSensorDiffAd_estimate += 0.0001f * TorqueSensorDiffAd_derived;
+                      delta_TorqueSensorDiffAd =  erro - TorqueSensorDiffAd_estimate;
                       TorqueSensorDiffAd_estimate += 0.0001f * pll_kp_ * delta_TorqueSensorDiffAd;
                       TorqueSensorDiffAd_derived += 0.0001f * pll_ki_ * delta_TorqueSensorDiffAd;
                       derivative  = TorqueSensorDiffAd_derived;
                       now_TargetTorque_Nm = Kp * erro + Kd *derivative + user_torque_setpoint*torque_base/(KT * ReductionRatio) + friction_force ;//+ friction_force;// gravity/(KT * ReductionRatio);// + friction_force ;//+  gravity_compensation/ (KT * ReductionRatio) ; 1.0375,0.065510 0.1779
+
+                      now_TargetTorque_Nm = LIMIT(now_TargetTorque_Nm, last_TargetTorque_Nm + MAX_CURRENT_RAMP, last_TargetTorque_Nm - MAX_CURRENT_RAMP);
                       now_TargetTorque_Nm = LIMIT(now_TargetTorque_Nm, MAX_CURRENT, -MAX_CURRENT);
                       now_TargetTorque_Nm_filter += 0.2f * (now_TargetTorque_Nm - now_TargetTorque_Nm_filter);
+
+
                       break;
                   case ADRC:
                       r = user_torque_setpoint;
@@ -859,8 +883,8 @@ interrupt void CIPC1_INT_isr(void)
       }
 
 
-      ipcCPU2ToCPU1Data.Reserve1 = (TorqueSensorDiffAd_pu)*torque_base;//now_TargetTorque_Nm_filter;//(TorqueSensorDiffAd_pu)*torque_base;//position_*180.f/M_PI;// velocity_*1500.f/M_PI;//  position_*180.f/M_PI;//(user_torque_setpoint)*torque_base;//now_TargetTorque_Nm*KT * ReductionRatio;//GetParm[0];//TorqueSensorDiffAd_pu*torque_base;// ipcCPU1ToCPU2Data.TargetTorque_Nm*1000/7; -1*9.8f*1.0375f*0.1779f
-      ipcCPU2ToCPU1Data.Reserve2 = (user_torque_setpoint)*torque_base;//now_TargetTorque_Nm;//(user_torque_setpoint)*torque_base;//actual_positon*180.f/M_PI;// w*30.f/M_PI;//actual_positon*180.f/M_PI;//TorqueSensorDiffAd_pu * torque_base;//TorqueSensorDiffAd_pu*torque_base;//xx22*torque_base;//xx22;//Task50usTime.CycleTime_us;//锟斤拷锟�5
+      ipcCPU2ToCPU1Data.Reserve1 = chirp_signal_.position*180.f/M_PI;//(TorqueSensorDiffAd_pu)*torque_base;//now_TargetTorque_Nm_filter;//(TorqueSensorDiffAd_pu)*torque_base;//position_*180.f/M_PI;// velocity_*1500.f/M_PI;//  position_*180.f/M_PI;//(user_torque_setpoint)*torque_base;//now_TargetTorque_Nm*KT * ReductionRatio;//GetParm[0];//TorqueSensorDiffAd_pu*torque_base;// ipcCPU1ToCPU2Data.TargetTorque_Nm*1000/7; -1*9.8f*1.0375f*0.1779f
+      ipcCPU2ToCPU1Data.Reserve2 = actual_positon*180.f/M_PI;//(user_torque_setpoint)*torque_base;//now_TargetTorque_Nm;//(user_torque_setpoint)*torque_base;//actual_positon*180.f/M_PI;// w*30.f/M_PI;//actual_positon*180.f/M_PI;//TorqueSensorDiffAd_pu * torque_base;//TorqueSensorDiffAd_pu*torque_base;//xx22*torque_base;//xx22;//Task50usTime.CycleTime_us;//锟斤拷锟�5
       ipcCPU2ToCPU1Data.Reserve3 = Task50usTime.LoadTime_us; //锟斤拷锟斤拷
 
 

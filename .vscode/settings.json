@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "makefile": "makefile",
+        "device.h": "c",
+        "type_traits": "cpp",
+        "limits": "cpp"
+    }
+}
